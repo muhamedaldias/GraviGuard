@@ -1,0 +1,63 @@
+{
+  "id": "S4",
+  "name": "Combined worst case",
+  "nameAr": "الحالة الأسوأ المشتركة",
+  "description": "z = −3.5 m, strainer K = 60, T = 45 °C, sensor noise on. Severe cavitation without protection; with GraviGuard the margin is restored until autonomy runs out.",
+  "descriptionAr": "منسوب −3.5 م، مصفاة K = 60، حرارة 45°م، ضوضاء حساسات مفعّلة. تجوف شديد بدون حماية؛ مع GraviGuard يُستعاد الهامش حتى تنفد ذاتية الخزان.",
+  "tags": [
+    "worst-case",
+    "severe",
+    "autonomy"
+  ],
+  "duration": 1800,
+  "seed": 1004,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": -3.5
+    },
+    {
+      "t": 0,
+      "param": "K_strainer",
+      "value": 60
+    },
+    {
+      "t": 0,
+      "param": "T",
+      "value": 45
+    },
+    {
+      "t": 0,
+      "param": "noiseScale",
+      "value": 1.5
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s4-minR",
+      "type": "minR",
+      "value": 0.9
+    },
+    {
+      "id": "s4-tank",
+      "type": "maxTankMin",
+      "value": 0.6
+    },
+    {
+      "id": "s4-fault",
+      "type": "stateSequence",
+      "expected": [
+        "ARMED",
+        "INJECTING",
+        "HOLD",
+        "FAULT_SAFE"
+      ]
+    }
+  ],
+  "expected": {
+    "off": "R ≈ 0.80, severe, head drop > 20 %, flow collapse",
+    "on": "R restored toward target; tank autonomy KPI shown; VFD fallback when autonomy is insufficient"
+  }
+}

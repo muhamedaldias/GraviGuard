@@ -1,0 +1,43 @@
+{
+  "id": "S9a",
+  "name": "Fault: valve stuck closed",
+  "nameAr": "عطل: صمام عالق مغلقاً",
+  "description": "The motorized valve is stuck closed while the plant needs injection. GraviGuard must raise an alarm and apply the VFD fallback.",
+  "descriptionAr": "الصمام الميكانيكي عالق مغلقاً بينما تحتاج المحطة إلى الحقن. يجب أن يطلق GraviGuard إنذاراً ويطبّق خفض سرعة الـVFD.",
+  "tags": [
+    "fault",
+    "valve"
+  ],
+  "duration": 900,
+  "seed": 1090,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": -3.5
+    },
+    {
+      "t": 0,
+      "param": "K_strainer",
+      "value": 60
+    },
+    {
+      "t": 0,
+      "param": "valveStuck",
+      "value": 1
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s9a-fault",
+      "type": "stateSequence",
+      "expected": [
+        "FAULT_SAFE"
+      ]
+    }
+  ],
+  "expected": {
+    "on": "Alarm + VFD fallback"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "S11",
+  "name": "RO feed-side demonstration (out of scope)",
+  "nameAr": "عرض جانب تغذية التناضح العكسي (خارج النطاق)",
+  "description": "Educational panel: a 0.4 bar lift on a 65 bar RO feed is < 1 % in magnitude; the ramp rate governs. Clearly labelled out of scope.",
+  "descriptionAr": "لوحة تعليمية: رفع 0.4 بار على تغذية تناضح عكسي بضغط 65 بار أقل من 1% في المقدار؛ معدل التغير هو الحاكم. موسوم بوضوح خارج النطاق.",
+  "tags": [
+    "ro",
+    "educational",
+    "out-of-scope"
+  ],
+  "duration": 60,
+  "seed": 1110,
+  "mode": "OFF",
+  "params": {
+    "roFeedBar": 65,
+    "roLiftBar": 0.4,
+    "roRampBarS": 2
+  },
+  "assertions": [],
+  "expected": {
+    "on": "Magnitude < 1 %; ramp above the vendor limit [VERIFY] flagged red"
+  }
+}

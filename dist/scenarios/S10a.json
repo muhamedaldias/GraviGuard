@@ -1,0 +1,36 @@
+{
+  "id": "S10a",
+  "name": "Water hammer: fast stroke (0.05 s)",
+  "nameAr": "الطرق المائي: شوط سريع (0.05 ث)",
+  "description": "Valve opened in 0.05 s (faster than 2L/a = 0.08 s). The Joukowsky estimate applies: ΔP ≈ 1.45 MPa.",
+  "descriptionAr": "فُتح الصمام في 0.05 ث (أسرع من 2L/a = 0.08 ث). ينطبق تقدير جوكوفسكي: ΔP ≈ 1.45 ميغاباسكال.",
+  "tags": [
+    "water-hammer",
+    "fast",
+    "surge"
+  ],
+  "duration": 120,
+  "seed": 1100,
+  "mode": "MANUAL",
+  "params": {
+    "valve.strokeTime": 0.05
+  },
+  "timeline": [
+    {
+      "t": 0,
+      "param": "manualValve",
+      "value": 1
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s10a-surge",
+      "type": "minSurgePeak",
+      "value": 1000000,
+      "tolerance": 0
+    }
+  ],
+  "expected": {
+    "on": "Fast: Joukowsky ΔP ≈ 1.45 MPa (14.5 bar)"
+  }
+}

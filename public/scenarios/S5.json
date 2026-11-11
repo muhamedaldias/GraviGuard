@@ -1,0 +1,44 @@
+{
+  "id": "S5",
+  "name": "Run-out (flow above BEP)",
+  "nameAr": "تشغيل فوق نقطة الكفاءة",
+  "description": "Discharge resistance lowered so Q ≈ 0.126 m³/s at z = −1.5 m. NPSH3 rises; GraviGuard still helps because NPSHa is the lever.",
+  "descriptionAr": "مقاومة التصريف منخفضة  so التدفق ≈ 0.126 م³/ث عند منسوب −1.5 م. يرتفع NPSH3؛ يظل GraviGuard مفيداً لأن NPSHa هو الرافعة.",
+  "tags": [
+    "runout",
+    "bep"
+  ],
+  "duration": 1800,
+  "seed": 1005,
+  "mode": "ON",
+  "params": {
+    "tank.V_usable": 250
+  },
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": -1.5
+    },
+    {
+      "t": 0,
+      "param": "k_discharge",
+      "value": 800
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s5-minR",
+      "type": "minR",
+      "value": 1.4
+    },
+    {
+      "id": "s5-transitions",
+      "type": "maxTransitions",
+      "value": 40
+    }
+  ],
+  "expected": {
+    "on": "Helps, because NPSHa is the lever; advisor still recommends checking the system curve"
+  }
+}

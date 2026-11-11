@@ -1,0 +1,18 @@
+{
+  "id": "S15",
+  "name": "Parametric sweep: tank elevation × stroke time",
+  "nameAr": "مسح بارامتري: ارتفاع الخزان × زمن الشوط",
+  "description": "Contour maps of minimum R and surge peak over tank elevation 5–20 m and valve stroke 3–60 s.",
+  "descriptionAr": "خرائط كونتور للحد الأدنى من R وذروة الطرق المائي  over ارتفاع الخزان 5–20 م وزمن الصمام 3–60 ث.",
+  "tags": [
+    "sweep",
+    "contour"
+  ],
+  "duration": 600,
+  "seed": 1015,
+  "mode": "ON",
+  "assertions": [],
+  "expected": {
+    "on": "Contour maps of minimum R and surge peak, feasible region shaded"
+  }
+}

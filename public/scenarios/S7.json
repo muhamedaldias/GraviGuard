@@ -1,0 +1,43 @@
+{
+  "id": "S7",
+  "name": "Air ingestion / vortex",
+  "nameAr": "سحب الهواء / الدوامة",
+  "description": "Bell raised to −3.0 m with level −2.5 m (submergence 0.5 m < S_min 0.77 m). HF vibration rises while R looks healthy; the disagreement detector must fire.",
+  "descriptionAr": "رفعة الجرس إلى −3.0 م مع منسوب −2.5 م (الغمر 0.5 م < الحد الأدنى 0.77 م). يرتفع الاهتزاز عالي التردد بينما يبدو الهامش سليماً؛ يجب أن يطلق كاشف التعارض.",
+  "tags": [
+    "air-ingestion",
+    "limit-case"
+  ],
+  "duration": 1800,
+  "seed": 1007,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": -2.5
+    },
+    {
+      "t": 0,
+      "param": "z_bell",
+      "value": -3
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s7-advisor",
+      "type": "advisorMessage",
+      "expected": [
+        "air-ingestion"
+      ]
+    },
+    {
+      "id": "s7-minR",
+      "type": "minR",
+      "value": 1.4
+    }
+  ],
+  "expected": {
+    "on": "Disagreement detector fires; advisor recommends intake design (HI 9.8, vortex suppressors)"
+  }
+}

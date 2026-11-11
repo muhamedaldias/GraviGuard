@@ -1,0 +1,47 @@
+{
+  "id": "S9b",
+  "name": "Fault: pressure sensor drift +30 kPa",
+  "nameAr": "عطل: انحراف حساس الضغط +30 كيلوباسكال",
+  "description": "One of three pressure sensors drifts by +30 kPa. 2-out-of-3 voting must isolate it and the plant must keep running.",
+  "descriptionAr": "أحد حساسات الضغط الثلاثة ينحرف بمقدار +30 كيلوباسكال. يجب أن يعزل التصويت 2-out-of-3 الحساس المعطل وتستمر المحطة.",
+  "tags": [
+    "fault",
+    "sensor",
+    "voting"
+  ],
+  "duration": 1800,
+  "seed": 1091,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": 1
+    },
+    {
+      "t": 0,
+      "param": "pressureDrift",
+      "value": 30000
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s9b-false",
+      "type": "falseInjections",
+      "value": 0
+    },
+    {
+      "id": "s9b-transitions",
+      "type": "maxTransitions",
+      "value": 4
+    },
+    {
+      "id": "s9b-minR",
+      "type": "minR",
+      "value": 2
+    }
+  ],
+  "expected": {
+    "on": "2oo3 vote isolates the drifting sensor"
+  }
+}

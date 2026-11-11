@@ -1,0 +1,41 @@
+{
+  "id": "S12",
+  "name": "Noise and false-alarm test",
+  "nameAr": "اختبار الضوضاء والإنذارات الكاذبة",
+  "description": "Healthy plant with doubled noise and random spikes. Zero false injections in one simulated hour.",
+  "descriptionAr": "محطة سليمة مع ضوضاء مضاعفة وذباذيب عشوائية. صفر حقن كاذب في ساعة محاكاة واحدة.",
+  "tags": [
+    "noise",
+    "false-alarm"
+  ],
+  "duration": 3600,
+  "seed": 1012,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": 1
+    },
+    {
+      "t": 0,
+      "param": "noiseScale",
+      "value": 2
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s12-false",
+      "type": "falseInjections",
+      "value": 0
+    },
+    {
+      "id": "s12-transitions",
+      "type": "maxTransitions",
+      "value": 4
+    }
+  ],
+  "expected": {
+    "on": "Zero false injections in 1 simulated hour; spike rejection visible"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "S6",
+  "name": "Low-flow recirculation",
+  "nameAr": "إعادة التدوير الداخلي عند تدفق منخفض",
+  "description": "Q forced to 0.04 m³/s (0.4 Q_BEP) with healthy NPSHa. Recirculation damage rises despite a healthy margin. GraviGuard must not claim a fix.",
+  "descriptionAr": "التدفق 0.04 م³/ث (0.4 من نقطة الكفاءة) مع NPSHa سليم. يرتفع ضرر إعادة التدوير رغم الهامش السليم. لا يجب أن يدّعي GraviGuard وجود حل.",
+  "tags": [
+    "recirculation",
+    "limit-case"
+  ],
+  "duration": 1800,
+  "seed": 1006,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": 1
+    },
+    {
+      "t": 0,
+      "param": "k_discharge",
+      "value": 19325
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s6-minR",
+      "type": "minR",
+      "value": 2.5
+    },
+    {
+      "id": "s6-advisor",
+      "type": "advisorMessage",
+      "expected": [
+        "recirculation"
+      ]
+    }
+  ],
+  "expected": {
+    "off": "RI ≈ 0.67, damage and vibration rise despite healthy R",
+    "on": "No benefit. Advisor: \"Recirculation, not NPSH. Not addressable by GraviGuard.\""
+  }
+}

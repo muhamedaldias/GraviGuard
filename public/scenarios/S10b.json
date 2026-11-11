@@ -1,0 +1,36 @@
+{
+  "id": "S10b",
+  "name": "Water hammer: nominal stroke (12 s)",
+  "nameAr": "الطرق المائي: الشوط الاسمي (12 ث)",
+  "description": "Valve opened in 12 s. Slow-closure estimate: ΔH ≈ 1 m (≈ 0.1 bar). Safe.",
+  "descriptionAr": "فُتح الصمام في 12 ث. تقدير الإغلاق البطيء: ΔH ≈ 1 م (≈ 0.1 بار). آمن.",
+  "tags": [
+    "water-hammer",
+    "nominal",
+    "surge"
+  ],
+  "duration": 180,
+  "seed": 1101,
+  "mode": "MANUAL",
+  "params": {
+    "valve.strokeTime": 12
+  },
+  "timeline": [
+    {
+      "t": 0,
+      "param": "manualValve",
+      "value": 1
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s10b-surge",
+      "type": "surgePeak",
+      "value": 200000,
+      "tolerance": 0
+    }
+  ],
+  "expected": {
+    "on": "Slow (12 s): ΔH ≈ 1 m (≈ 0.1 bar)"
+  }
+}

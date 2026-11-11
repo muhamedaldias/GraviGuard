@@ -1,0 +1,36 @@
+{
+  "id": "S10c",
+  "name": "Water hammer: slow stroke (30 s)",
+  "nameAr": "الطرق المائي: شوط بطيء (30 ث)",
+  "description": "Valve opened in 30 s. Slow-closure estimate: ΔH ≈ 0.38 m (≈ 0.04 bar).",
+  "descriptionAr": "فُتح الصمام في 30 ث. تقدير الإغلاق البطيء: ΔH ≈ 0.38 م (≈ 0.04 بار).",
+  "tags": [
+    "water-hammer",
+    "slow",
+    "surge"
+  ],
+  "duration": 240,
+  "seed": 1102,
+  "mode": "MANUAL",
+  "params": {
+    "valve.strokeTime": 30
+  },
+  "timeline": [
+    {
+      "t": 0,
+      "param": "manualValve",
+      "value": 1
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s10c-surge",
+      "type": "surgePeak",
+      "value": 100000,
+      "tolerance": 0
+    }
+  ],
+  "expected": {
+    "on": "Slow (30 s): ΔH ≈ 0.38 m"
+  }
+}

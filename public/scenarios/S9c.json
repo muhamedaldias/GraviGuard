@@ -1,0 +1,43 @@
+{
+  "id": "S9c",
+  "name": "Fault: check-valve leak",
+  "nameAr": "عطل: تسرب صمام عدم الرجوع",
+  "description": "The source check valve leaks, so lifted water flows back to the source. The simulator must flag source-flow reversal.",
+  "descriptionAr": "صمام عدم الرجوع في خط المصدر يتسرب، فيعود الماء المرفوع إلى المصدر. يجب أن يشير المحاكي إلى انعكاس تدفق المصدر.",
+  "tags": [
+    "fault",
+    "check-valve"
+  ],
+  "duration": 900,
+  "seed": 1092,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": -2
+    },
+    {
+      "t": 0,
+      "param": "K_strainer",
+      "value": 20
+    },
+    {
+      "t": 0,
+      "param": "checkValveLeak",
+      "value": 1
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s9c-advisor",
+      "type": "advisorMessage",
+      "expected": [
+        "check-valve-leak"
+      ]
+    }
+  ],
+  "expected": {
+    "on": "Leak flagged by source-flow reversal"
+  }
+}

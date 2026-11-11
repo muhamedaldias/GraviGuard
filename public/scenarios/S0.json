@@ -1,0 +1,51 @@
+{
+  "id": "S0",
+  "name": "Healthy baseline",
+  "nameAr": "خط أساس سليم",
+  "description": "Reference plant at z = +1.0 m and T = 35 °C for 30 min. GraviGuard must stay idle.",
+  "descriptionAr": "المحطة المرجعية عند منسوب +1.0 م ودرجة حرارة 35°م لمدة 30 دقيقة. يجب أن يبقى GraviGuard خاملاً.",
+  "tags": [
+    "baseline",
+    "healthy"
+  ],
+  "duration": 1800,
+  "seed": 1000,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": 1
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s0-minR",
+      "type": "minR",
+      "value": 2
+    },
+    {
+      "id": "s0-maxCI",
+      "type": "maxCI",
+      "value": 0.05
+    },
+    {
+      "id": "s0-maxHeadDrop",
+      "type": "maxHeadDrop",
+      "value": 0.01
+    },
+    {
+      "id": "s0-transitions",
+      "type": "maxTransitions",
+      "value": 2
+    },
+    {
+      "id": "s0-false",
+      "type": "falseInjections",
+      "value": 0
+    }
+  ],
+  "expected": {
+    "on": "R ≈ 2.3, CI = 0, controller IDLE, zero valve movement, tank untouched"
+  }
+}

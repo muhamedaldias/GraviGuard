@@ -1,0 +1,39 @@
+{
+  "id": "S9d",
+  "name": "Fault: sensor dropout",
+  "nameAr": "عطل: انقطاع الحساس",
+  "description": "The suction pressure transmitter drops out. The estimator must detect the loss and the controller must go fail-safe.",
+  "descriptionAr": "جهاز إرسال ضغط الشفط ينقطع. يجب أن يكتشف المقدِّر الفقد وينتقل المتحكم إلى وضع الأمان.",
+  "tags": [
+    "fault",
+    "sensor",
+    "fail-safe"
+  ],
+  "duration": 900,
+  "seed": 1093,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": -2
+    },
+    {
+      "t": 0,
+      "param": "pressureDropout",
+      "value": 1
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s9d-fault",
+      "type": "stateSequence",
+      "expected": [
+        "FAULT_SAFE"
+      ]
+    }
+  ],
+  "expected": {
+    "on": "FAULT_SAFE"
+  }
+}

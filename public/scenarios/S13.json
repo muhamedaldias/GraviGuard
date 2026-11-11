@@ -1,0 +1,41 @@
+{
+  "id": "S13",
+  "name": "VFD speed change",
+  "nameAr": "تغيير سرعة الـVFD",
+  "description": "Speed ramps 105 → 80 %. NPSH3 falls with n² and R rises: speed reduction is the alternative lever.",
+  "descriptionAr": "تنخفض السرعة من 105 إلى 80%. ينخفض NPSH3 مع n² ويرتفع R: خفض السرعة هو الرافعة البديلة.",
+  "tags": [
+    "vfd",
+    "affinity"
+  ],
+  "duration": 1800,
+  "seed": 1013,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": 1
+    },
+    {
+      "t": 0,
+      "param": "n",
+      "value": 1.05
+    },
+    {
+      "t": 900,
+      "param": "n",
+      "value": 0.8
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s13-minR",
+      "type": "minR",
+      "value": 1.9
+    }
+  ],
+  "expected": {
+    "on": "NPSH3 falls with n², R rises"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "S1",
+  "name": "Tidal drawdown",
+  "nameAr": "انخفاض المد",
+  "description": "Source level falls from +1.0 m to −4.5 m over 20 min, holds, then recovers. GraviGuard must hold the margin near 1.7. Tank sized at 200 m³ for this event (see DECISIONS.md).",
+  "descriptionAr": "ينخفض منسوب المصدر من +1.0 م إلى −4.5 م خلال 20 دقيقة ثم يتعافى. يجب أن يحافظ GraviGuard على الهامش قرب 1.7. الخزان 200 م³ لهذه الحالة.",
+  "tags": [
+    "tide",
+    "transient",
+    "target"
+  ],
+  "duration": 3600,
+  "seed": 1001,
+  "mode": "ON",
+  "params": {
+    "tank.V_usable": 200
+  },
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": 1
+    },
+    {
+      "t": 1200,
+      "param": "z_level",
+      "value": -4.5
+    },
+    {
+      "t": 2400,
+      "param": "z_level",
+      "value": -4.5
+    },
+    {
+      "t": 3000,
+      "param": "z_level",
+      "value": 1
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s1-minR",
+      "type": "minR",
+      "value": 1.5
+    },
+    {
+      "id": "s1-tank",
+      "type": "tankMin",
+      "value": 8
+    },
+    {
+      "id": "s1-transitions",
+      "type": "maxTransitions",
+      "value": 40
+    },
+    {
+      "id": "s1-false",
+      "type": "falseInjections",
+      "value": 0
+    }
+  ],
+  "expected": {
+    "on": "R held near 1.7, tank used < 60 %, no chatter, recovery at the end"
+  }
+}

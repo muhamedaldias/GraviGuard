@@ -1,0 +1,55 @@
+{
+  "id": "S2",
+  "name": "Strainer fouling",
+  "nameAr": "انسداد المصفاة",
+  "description": "Source at −1.0 m; strainer K rises from 2 to 80 over 30 min. GraviGuard must arm early and hold the target margin.",
+  "descriptionAr": "المصدر عند −1.0 م؛ يرتفع معامل المصفاة من 2 إلى 80 خلال 30 دقيقة. يجب أن يستعد GraviGuard مبكراً ويحافظ على الهامش المستهدف.",
+  "tags": [
+    "fouling",
+    "slow",
+    "target"
+  ],
+  "duration": 2400,
+  "seed": 1002,
+  "mode": "ON",
+  "params": {
+    "tank.V_usable": 250
+  },
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": -1
+    },
+    {
+      "t": 0,
+      "param": "K_strainer",
+      "value": 2
+    },
+    {
+      "t": 1800,
+      "param": "K_strainer",
+      "value": 80
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s2-minR",
+      "type": "minR",
+      "value": 1.5
+    },
+    {
+      "id": "s2-transitions",
+      "type": "maxTransitions",
+      "value": 6
+    },
+    {
+      "id": "s2-false",
+      "type": "falseInjections",
+      "value": 0
+    }
+  ],
+  "expected": {
+    "on": "Early arming by slope prediction, R held at target"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "S14",
+  "name": "Monte Carlo (500 runs)",
+  "nameAr": "مونت كارلو (500 تشغيلة)",
+  "description": "500 seeded runs varying tide amplitude, fouling rate, temperature, noise and stroke time. Compares ON vs OFF statistics.",
+  "descriptionAr": "500 تشغيلة مذيلية تغيّر سعة المد ومعدل الانسداد والحرارة والضوضاء وزمن الشوط. تقارن إحصاءات التشغيل والتوقف.",
+  "tags": [
+    "monte-carlo",
+    "sweep"
+  ],
+  "duration": 1800,
+  "seed": 1014,
+  "mode": "AB",
+  "assertions": [],
+  "expected": {
+    "on": "P(R < 1.5), mean damage index, P95 tank volume, ON vs OFF"
+  }
+}

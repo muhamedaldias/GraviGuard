@@ -1,0 +1,52 @@
+{
+  "id": "S8",
+  "name": "Tank depletion",
+  "nameAr": "نضوب الخزان",
+  "description": "S4 conditions held for 25 min. The tank reaches reserve; the controller must move to FAULT_SAFE and command a VFD speed reduction before the level drops below reserve.",
+  "descriptionAr": "ظروف S4 مستمرة لمدة 25 دقيقة. يصل الخزان إلى الاحتياطي؛ يجب أن ينتقل المتحكم إلى FAULT_SAFE ويأمر بخفض سرعة الـVFD قبل انخفاض المنسوب تحت الاحتياطي.",
+  "tags": [
+    "autonomy",
+    "fault-safe",
+    "worst-case"
+  ],
+  "duration": 1500,
+  "seed": 1008,
+  "mode": "ON",
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": -3.5
+    },
+    {
+      "t": 0,
+      "param": "K_strainer",
+      "value": 60
+    },
+    {
+      "t": 0,
+      "param": "T",
+      "value": 45
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s8-tank",
+      "type": "maxTankMin",
+      "value": 0.6
+    },
+    {
+      "id": "s8-fault",
+      "type": "stateSequence",
+      "expected": [
+        "ARMED",
+        "INJECTING",
+        "HOLD",
+        "FAULT_SAFE"
+      ]
+    }
+  ],
+  "expected": {
+    "on": "Tank reaches reserve; FAULT_SAFE; VFD speed reduction to 85 %"
+  }
+}

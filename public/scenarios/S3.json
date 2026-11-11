@@ -1,0 +1,49 @@
+{
+  "id": "S3",
+  "name": "Rising temperature",
+  "nameAr": "ارتفاع درجة الحرارة",
+  "description": "Temperature rises 35 → 60 °C at z = −2.0 m. Vapour pressure climbs; the estimator must compensate through T-corrected Pv.",
+  "descriptionAr": "ترتفع الحرارة من 35 إلى 60°م عند منسوب −2.0 م. يرتفع ضغط البخار؛ يجب أن يعوّض المقدِّر عبر تصحيح درجة الحرارة.",
+  "tags": [
+    "temperature",
+    "slow"
+  ],
+  "duration": 2400,
+  "seed": 1003,
+  "mode": "ON",
+  "params": {
+    "tank.V_usable": 250
+  },
+  "timeline": [
+    {
+      "t": 0,
+      "param": "z_level",
+      "value": -2
+    },
+    {
+      "t": 0,
+      "param": "T",
+      "value": 35
+    },
+    {
+      "t": 1800,
+      "param": "T",
+      "value": 60
+    }
+  ],
+  "assertions": [
+    {
+      "id": "s3-minR",
+      "type": "minR",
+      "value": 1.5
+    },
+    {
+      "id": "s3-transitions",
+      "type": "maxTransitions",
+      "value": 30
+    }
+  ],
+  "expected": {
+    "on": "Compensated through T-corrected vapour pressure in the estimator"
+  }
+}
