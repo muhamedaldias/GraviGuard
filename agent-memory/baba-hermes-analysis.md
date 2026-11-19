@@ -3,8 +3,9 @@ agent: hermes
 machine: baba
 issue: analysis-001
 branch: work/analysis-001-repo-deep-review
-status: in-progress
-updated: 2026-11-19T23:55:00Z
+status: done
+updated: 2026-11-19T23:42:37Z
+pr: https://github.com/muhamedaldias/GraviGuard/pull/1
 ---
 
 # Understanding
@@ -70,9 +71,10 @@ JSONs; 16 pages; en/ar i18n (316 keys each). ~4.9k LOC src, 472 LOC tests.
 - Roadmap: P0=3, P1=9, P2=7 (19 items), file-ownership partitioned, sequenced.
 
 # Handoff
-Remaining at this checkpoint: commit agent-memory/ + analysis/ on the branch, push to
-origin, open PR "analysis-001: deep repo review" (gh authenticated as muhamedaldias),
-then patch this file: status done + PR URL + final UTC timestamp, second commit, push.
-If resuming cold: everything needed is in analysis/REPO-ANALYSIS-001.md; git state was
-clean except untracked agent-memory/ and analysis/; preview server may still be running
-on :4173 (kill by port if needed; do NOT pkill -f 'vite preview' — it matches own shell).
+DONE. Commits: 3ac5649 (report + memory) + final checkpoint commit on
+work/analysis-001-repo-deep-review, pushed to origin. PR #1 OPEN against main:
+https://github.com/muhamedaldias/GraviGuard/pull/1 (verified via gh pr view: +1668/−0).
+Everything needed is in analysis/REPO-ANALYSIS-001.md. Next session (if any): create
+GitHub issues from report §8 roadmap items (P0=3, P1=9, P2=7) — each is self-contained
+with acceptance criteria and partitioned file ownership. Preview server may still be
+running on :4173 (kill by port if needed; do NOT pkill -f 'vite preview' — matches own shell).
