@@ -40,6 +40,7 @@ export function SensorsPage() {
       <div className="panel">
         <div className="panel-title">NPSHa — {t('sensors.truth')} / {t('sensors.measured')}</div>
         <StripChart
+          x={tArr}
           series={[
             { label: t('sensors.truth'), color: 'var(--water)', data: truth },
             { label: t('sensors.measured'), color: 'var(--warning)', data: measured },

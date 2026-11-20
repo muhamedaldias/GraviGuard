@@ -81,6 +81,10 @@ export function Curves() {
         <div className="panel">
           <div className="panel-title">{t('curves.hq')}</div>
           <StripChart
+            x={qs}
+            xLabel="Q"
+            xUnit="m³/s"
+            xDecimals={3}
             series={[
               { label: 'H', color: 'var(--accent)', data: curves.H },
               { label: t('curves.sysCurve'), color: 'var(--warning)', data: curves.sys },
@@ -94,6 +98,10 @@ export function Curves() {
         <div className="panel">
           <div className="panel-title">{t('curves.npsh')}</div>
           <StripChart
+            x={qs}
+            xLabel="Q"
+            xUnit="m³/s"
+            xDecimals={3}
             series={[
               { label: 'NPSHa', color: 'var(--water)', data: qs.map(() => npshaAtOp) },
               { label: 'NPSH3', color: 'var(--critical)', data: curves.NPSH3 },
@@ -106,11 +114,11 @@ export function Curves() {
         </div>
         <div className="panel">
           <div className="panel-title">{t('curves.etaq')}</div>
-          <StripChart series={[{ label: 'η %', color: 'var(--safe)', data: curves.eta }]} height={160} yLabel="%" />
+          <StripChart x={qs} xLabel="Q" xUnit="m³/s" xDecimals={3} series={[{ label: 'η %', color: 'var(--safe)', data: curves.eta }]} height={160} yLabel="%" />
         </div>
         <div className="panel">
           <div className="panel-title">{t('curves.pq')}</div>
-          <StripChart series={[{ label: 'P', color: 'var(--warning)', data: curves.P }]} height={160} yLabel={units === 'SI' ? 'kW' : 'hp'} />
+          <StripChart x={qs} xLabel="Q" xUnit="m³/s" xDecimals={3} series={[{ label: 'P', color: 'var(--warning)', data: curves.P }]} height={160} yLabel={units === 'SI' ? 'kW' : 'hp'} />
         </div>
       </div>
 
