@@ -161,10 +161,31 @@ describe('worker inbound validation + error channel', () => {
     if (mid.ok && mid.msg.type === 'speed') expect(mid.msg.speed).toBe(2);
   });
 
-  it('clamps step seconds to max 3600', () => {
+  // verdict-issue3 F3: the step cap must bound the synchronous worker block.
+  // At dt=0.01 a 3600 s cap meant 360000 steps (~5 s blocked, tester-measured);
+  // 10 s (1000 steps) keeps the worst case inside loop()'s 20 ms frame budget.
+  it('clamps step seconds to max 10', () => {
     const v = validateInbound({ type: 'step', seconds: 99999 });
     expect(v.ok).toBe(true);
-    if (v.ok && v.msg.type === 'step') expect(v.msg.seconds).toBe(3600);
+    if (v.ok && v.msg.type === 'step') expect(v.msg.seconds).toBe(10);
+    const atCap = validateInbound({ type: 'step', seconds: 10 });
+    expect(atCap.ok).toBe(true);
+    if (atCap.ok && atCap.msg.type === 'step') expect(atCap.msg.seconds).toBe(10);
+    const under = validateInbound({ type: 'step', seconds: 1 });
+    expect(under.ok).toBe(true);
+    if (under.ok && under.msg.type === 'step') expect(under.msg.seconds).toBe(1);
+  });
+
+  it('max-cap step completes within a frame-sized budget and advances t by the capped seconds', () => {
+    const t0 = getSnapshot(processMessage({ type: 'step', seconds: 0 })).t;
+    const start = performance.now();
+    const out = processMessage({ type: 'step', seconds: 99999 });
+    const elapsed = performance.now() - start;
+    // Old 3600 s cap blocked ~5000 ms here; 1000 steps must stay well under
+    // 500 ms even on slow CI (generous bound, ~35x headroom over measured cost).
+    expect(elapsed).toBeLessThan(500);
+    const t = getSnapshot(out).t;
+    expect(Math.abs(t - (t0 + 10))).toBeLessThanOrEqual(PHYSICS_DT + 1e-9);
   });
 
   // (g) input validation.
