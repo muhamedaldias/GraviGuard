@@ -114,7 +114,8 @@
     "npshaSrc": "Source-only NPSHa",
     "est": "Estimator",
     "noCav": "No cavitation risk",
-    "evidence": "Evidence"
+    "evidence": "Evidence",
+    "cvLeak": "CV leak"
   },
   "curves": {
     "title": "Pump Curves & NPSH Chart",
@@ -197,7 +198,9 @@
     "stuck": "Stuck",
     "dropout": "Dropout",
     "spike": "Spike",
-    "healthy": "Sensor health"
+    "healthy": "Sensor health",
+    "vs": "vs",
+    "bits": "bits"
   },
   "transients": {
     "title": "Transients & Water Hammer",
@@ -212,7 +215,8 @@
     "roRamp": "Ramp rate",
     "roLimit": "Vendor ramp limit [VERIFY]",
     "atValve": "At valve",
-    "atJunction": "At junction"
+    "atJunction": "At junction",
+    "roSummary": "{{feed}} bar feed · +{{lift}} bar lift · magnitude < 1 % · ramp governs the valve stroke."
   },
   "sizing": {
     "title": "Sizing & Economics (illustrative)",
@@ -235,7 +239,58 @@
     "effective": "Effective",
     "notEffective": "Not effective",
     "partial": "Partial",
-    "reason": "Reason"
+    "reason": "Reason",
+    "caseHeader": "Case",
+    "outOfScope": "Out of scope",
+    "cases": {
+      "variableSuction": {
+        "case": "Centrifugal pump, variable suction (seawater intake, lift stations, irrigation, filter feed)",
+        "reason": "NPSHa is the limiting variable and can be raised"
+      },
+      "strainerFouling": {
+        "case": "Suction strainer fouling, low source level, rising temperature",
+        "reason": "Raises NPSHa during the event"
+      },
+      "lowFlowRecirc": {
+        "case": "Low-flow recirculation (Q below about 0.6 Q_BEP) / throttled discharge",
+        "reason": "Root cause is internal recirculation; raising suction pressure does not fix it"
+      },
+      "airIngestion": {
+        "case": "Air ingestion / intake vortices",
+        "reason": "Needs intake design (HI 9.8 submergence, vortex suppressors)"
+      },
+      "nearBoiling": {
+        "case": "Fluids near boiling (LPG, refrigerants, hot condensate)",
+        "reason": "Needs inducers / low-NPSH impellers / lower-set tanks"
+      },
+      "roHpp": {
+        "case": "RO high-pressure pump (HPP)",
+        "reason": "Stable-state risk is low; the real risk is the rate of pressure change on membranes"
+      },
+      "reciprocating": {
+        "case": "Reciprocating pumps",
+        "reason": "Governed by NPIPa (NPSHa minus acceleration head), not NPSHa"
+      },
+      "fastPhenomena": {
+        "case": "Fast phenomena (injectors, wet liners, control valves)",
+        "reason": "Valve + tank response is far slower than the events"
+      },
+      "thermalDeaerator": {
+        "case": "Thermal plants with deaerators",
+        "reason": "Elevation already used statically; only dynamic activation is new"
+      }
+    },
+    "scale": {
+      "waterHammer": "Water hammer",
+      "cavitation": "Cavitation",
+      "airIngestion": "Air ingestion",
+      "recirculation": "Recirculation",
+      "roRampLimit": "RO ramp limit",
+      "valveStroke": "Valve stroke",
+      "vfdRamp": "VFD ramp",
+      "temperatureDrift": "Temperature drift",
+      "tideFouling": "Tide / fouling"
+    }
   },
   "montecarlo": {
     "title": "Monte Carlo & Sweeps",
@@ -284,7 +339,48 @@
     "synthetic": "Synthetic data statement",
     "variable": "Variable",
     "unit": "Unit",
-    "formula": "Formula"
+    "formula": "Formula",
+    "name": "Name",
+    "syntheticBody": "Every plant, pump, sensor and result in this platform is synthetic and deterministic (seeded). Identical seed and parameters give bit-identical headless results. The platform demonstrates a concept; it is not a design or sizing tool for real plants.",
+    "unverifiedItems": {
+      "marginFactors": "ANSI/HI 9.6.1 margin factors — exact values not confirmed from a primary source.",
+      "roRamp": "RO membrane ramp limit (~0.7 bar/s) — must be confirmed with DuPont / Hydranautics / Toray guidance.",
+      "patent": "Patent search for the dynamic NPSHa lift mechanism is still required."
+    },
+    "limitItems": {
+      "hydraulics": "Steady-state and lumped-inertia hydraulics only; no method-of-characteristics surge solver in phase 1.",
+      "damageIndex": "Damage index is illustrative and normalised; it is not a life prediction.",
+      "vibration": "Synthetic vibration is a secondary confirmation signal, never the primary trigger.",
+      "noRealData": "No real-plant, vendor, or SWA data is used or implied."
+    },
+    "referenceItems": {
+      "hi961": "ANSI/HI 9.6.1 — Rotodynamic Pumps: Guideline for NPSH Margin",
+      "hi963": "ANSI/HI 9.6.3 — Rotodynamic Pumps: Guideline for Operating Regions",
+      "hi98": "ANSI/HI 9.8 — Rotodynamic Pumps: Intake Design",
+      "hi66": "ANSI/HI 6.6 — Rotodynamic Pumps: Pump Pipe Connection",
+      "roVendors": "DuPont / Hydranautics / Toray — RO system design guidance (ramp-rate limits)"
+    },
+    "vars": {
+      "surfacePressure": "Surface pressure",
+      "vapourPressure": "Vapour pressure",
+      "density": "Density",
+      "gravity": "Gravity",
+      "staticLift": "Static lift",
+      "suctionLoss": "Suction line loss",
+      "lossCoefficients": "Loss coefficients",
+      "velocity": "Velocity",
+      "temperature": "Temperature",
+      "npsha": "Net positive suction head available",
+      "npsh3Drop": "NPSH at 3% head drop",
+      "speed": "Speed",
+      "flowPerEye": "Flow per eye",
+      "requiredNpsh": "Required NPSH",
+      "waveSpeed": "Wave speed",
+      "pipeLength": "Pipe length",
+      "strokeTime": "Valve stroke time",
+      "usableVolume": "Usable tank volume",
+      "suppliedFlow": "Supplied flow"
+    }
   },
   "tour": {
     "title": "Guided Tour",
@@ -358,5 +454,27 @@
     "m3": "m³",
     "rpm": "rpm",
     "s": "s"
+  },
+  "alarm": {
+    "reserve": "Tank at reserve — injection blocked",
+    "r-low": "Margin ratio below 1.0 — cavitation",
+    "r-watch": "Margin ratio below target",
+    "sensor": "Sensor plausibility check failed",
+    "valve": "Valve fault detected",
+    "recirc": "Low-flow recirculation detected",
+    "air": "Air ingestion / vortex risk",
+    "checkvalve": "Check valve leak — source flow reversal",
+    "ctrl-tank": "Tank at reserve — injection blocked, VFD fallback",
+    "ctrl-valve": "Valve fault detected — GraviGuard unavailable",
+    "ctrl-sensor": "Sensor fault detected — fail-safe active",
+    "ctrl-cycles": "Injection cycle limit exceeded (3/hour)"
+  },
+  "chart": {
+    "speedPct": "speed %",
+    "tank": "tank",
+    "valve": "valve",
+    "vib": "vib",
+    "damage": "damage",
+    "ghost": "ghost"
   }
 }

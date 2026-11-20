@@ -3,29 +3,30 @@ import { Badge } from '../components/Badges';
 
 type Effectiveness = 'yes' | 'no' | 'partial' | 'out';
 
-const CASES: { case: string; effective: Effectiveness; reason: string }[] = [
-  { case: 'Centrifugal pump, variable suction (seawater intake, lift stations, irrigation, filter feed)', effective: 'yes', reason: 'NPSHa is the limiting variable and can be raised' },
-  { case: 'Suction strainer fouling, low source level, rising temperature', effective: 'yes', reason: 'Raises NPSHa during the event' },
-  { case: 'Low-flow recirculation (Q below about 0.6 Q_BEP) / throttled discharge', effective: 'no', reason: 'Root cause is internal recirculation; raising suction pressure does not fix it' },
-  { case: 'Air ingestion / intake vortices', effective: 'no', reason: 'Needs intake design (HI 9.8 submergence, vortex suppressors)' },
-  { case: 'Fluids near boiling (LPG, refrigerants, hot condensate)', effective: 'no', reason: 'Needs inducers / low-NPSH impellers / lower-set tanks' },
-  { case: 'RO high-pressure pump (HPP)', effective: 'out', reason: 'Stable-state risk is low; the real risk is the rate of pressure change on membranes' },
-  { case: 'Reciprocating pumps', effective: 'out', reason: 'Governed by NPIPa (NPSHa minus acceleration head), not NPSHa' },
-  { case: 'Fast phenomena (injectors, wet liners, control valves)', effective: 'no', reason: 'Valve + tank response is far slower than the events' },
-  { case: 'Thermal plants with deaerators', effective: 'partial', reason: 'Elevation already used statically; only dynamic activation is new' },
+// Case/reason strings live in the catalogue (applicability.cases.<id>); ids are stable.
+const CASES: { id: string; effective: Effectiveness }[] = [
+  { id: 'variableSuction', effective: 'yes' },
+  { id: 'strainerFouling', effective: 'yes' },
+  { id: 'lowFlowRecirc', effective: 'no' },
+  { id: 'airIngestion', effective: 'no' },
+  { id: 'nearBoiling', effective: 'no' },
+  { id: 'roHpp', effective: 'out' },
+  { id: 'reciprocating', effective: 'out' },
+  { id: 'fastPhenomena', effective: 'no' },
+  { id: 'thermalDeaerator', effective: 'partial' },
 ];
 
-// Log-scale timescale (seconds).
+// Log-scale timescale (seconds). Labels live in applicability.scale.<id>.
 const SCALE = [
-  { label: 'Water hammer', t: 0.08, kind: 'event' },
-  { label: 'Cavitation', t: 1, kind: 'event' },
-  { label: 'Air ingestion', t: 2, kind: 'event' },
-  { label: 'Recirculation', t: 10, kind: 'event' },
-  { label: 'RO ramp limit', t: 3, kind: 'event' },
-  { label: 'Valve stroke', t: 12, kind: 'response' },
-  { label: 'VFD ramp', t: 5, kind: 'response' },
-  { label: 'Temperature drift', t: 600, kind: 'event' },
-  { label: 'Tide / fouling', t: 7200, kind: 'event' },
+  { id: 'waterHammer', t: 0.08, kind: 'event' },
+  { id: 'cavitation', t: 1, kind: 'event' },
+  { id: 'airIngestion', t: 2, kind: 'event' },
+  { id: 'recirculation', t: 10, kind: 'event' },
+  { id: 'roRampLimit', t: 3, kind: 'event' },
+  { id: 'valveStroke', t: 12, kind: 'response' },
+  { id: 'vfdRamp', t: 5, kind: 'response' },
+  { id: 'temperatureDrift', t: 600, kind: 'event' },
+  { id: 'tideFouling', t: 7200, kind: 'event' },
 ];
 
 export function ApplicabilityPage() {
@@ -41,21 +42,21 @@ export function ApplicabilityPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ textAlign: 'start', color: 'var(--text-2)' }}>
-              <th style={{ padding: 6, borderBottom: '1px solid var(--line)' }}>Case</th>
+              <th style={{ padding: 6, borderBottom: '1px solid var(--line)' }}>{t('applicability.caseHeader')}</th>
               <th style={{ padding: 6, borderBottom: '1px solid var(--line)' }}>{t('applicability.effective')}?</th>
               <th style={{ padding: 6, borderBottom: '1px solid var(--line)' }}>{t('applicability.reason')}</th>
             </tr>
           </thead>
           <tbody>
             {CASES.map((c) => (
-              <tr key={c.case}>
-                <td style={{ padding: 6, borderBottom: '1px solid var(--line-soft)', maxWidth: 320 }}>{c.case}</td>
+              <tr key={c.id}>
+                <td style={{ padding: 6, borderBottom: '1px solid var(--line-soft)', maxWidth: 320 }}>{t(`applicability.cases.${c.id}.case`)}</td>
                 <td style={{ padding: 6, borderBottom: '1px solid var(--line-soft)' }}>
                   <Badge tone={c.effective === 'yes' ? 'safe' : c.effective === 'partial' ? 'watch' : c.effective === 'out' ? 'info' : 'critical'}>
-                    {c.effective === 'yes' ? t('applicability.effective') : c.effective === 'no' ? t('applicability.notEffective') : c.effective === 'partial' ? t('applicability.partial') : 'Out of scope'}
+                    {c.effective === 'yes' ? t('applicability.effective') : c.effective === 'no' ? t('applicability.notEffective') : c.effective === 'partial' ? t('applicability.partial') : t('applicability.outOfScope')}
                   </Badge>
                 </td>
-                <td style={{ padding: 6, borderBottom: '1px solid var(--line-soft)' }} className="muted">{c.reason}</td>
+                <td style={{ padding: 6, borderBottom: '1px solid var(--line-soft)' }} className="muted">{t(`applicability.cases.${c.id}.reason`)}</td>
               </tr>
             ))}
           </tbody>
@@ -92,10 +93,10 @@ function Timescale() {
         const y = 30 + i * 24;
         const isResp = r.kind === 'response';
         return (
-          <g key={r.label}>
+          <g key={r.id}>
             <circle cx={x(r.t)} cy={y} r={5} fill={isResp ? 'var(--accent)' : 'var(--warning)'} />
             <text x={x(r.t) + 9} y={y + 4} fill="var(--text-1)" fontSize={11}>
-              {r.label}
+              {t(`applicability.scale.${r.id}`)}
             </text>
             {isResp && <circle cx={x(r.t)} cy={y} r={9} fill="none" stroke="var(--accent)" strokeWidth={1} opacity={0.5} />}
           </g>
