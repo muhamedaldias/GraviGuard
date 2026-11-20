@@ -53,6 +53,7 @@ export default function App() {
   const seed = useApp((s) => s.seed);
   const snapshot = useApp((s) => s.snapshot);
   const quality = useApp((s) => s.quality);
+  const workerError = useApp((s) => s.workerError);
 
   useSimLifecycle();
 
@@ -124,6 +125,15 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {workerError !== null && (
+        <div
+          role="alert"
+          style={{ padding: '8px 16px', background: 'var(--critical)', color: '#fff', fontSize: 13 }}
+        >
+          Simulation worker error: {workerError}
+        </div>
+      )}
 
       <main className="content">
         <ActiveComponent />

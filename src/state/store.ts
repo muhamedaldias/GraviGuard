@@ -68,6 +68,7 @@ interface AppState {
   scenario: Scenario | null;
   params: PlantParams;
   historyVersion: number;
+  workerError: string | null;
 
   setLang: (l: LangCode) => void;
   setTheme: (t: 'dark' | 'light') => void;
@@ -81,6 +82,7 @@ interface AppState {
   setSeed: (s: number) => void;
   setScenario: (sc: Scenario | null) => void;
   setParams: (mutate: (p: PlantParams) => void) => void;
+  setWorkerError: (e: string | null) => void;
 }
 
 export const useApp = create<AppState>((set) => ({
@@ -98,6 +100,7 @@ export const useApp = create<AppState>((set) => ({
   scenario: null,
   params: defaultPlant(),
   historyVersion: 0,
+  workerError: null,
 
   setLang: (lang) => set({ lang }),
   setTheme: (theme) => set({ theme }),
@@ -123,6 +126,7 @@ export const useApp = create<AppState>((set) => ({
       mutate(params);
       return { params };
     }),
+  setWorkerError: (workerError) => set({ workerError }),
   }));
 
   // Debug/testing handle (harmless in production).
