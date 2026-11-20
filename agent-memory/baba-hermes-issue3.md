@@ -4,7 +4,7 @@ machine: baba
 issue: 3
 branch: work/issue-3-worker-hardening
 status: done
-updated: 2026-11-20T00:25:00Z
+updated: 2026-11-20T00:55:00Z
 pr: https://github.com/muhamedaldias/GraviGuard/pull/9
 ---
 
@@ -89,3 +89,59 @@ lifecycle + message hardening"). Issue comment posted (issuecomment-7025989809).
 All 5 acceptance criteria verified (unit + browser). Preview server proc_0ed38610c01e
 may still run on :4173 — kill by port if needed. Next: issue #4 on
 work/issue-4-sensor-synthesis from origin/main; see agent-memory/baba-hermes-issue4.md.
+
+# Fix-round-1 (independent verdict FAIL → addressed)
+Tester verdict: /tmp/verdict-issue3.md — all 5 ACs PASS, overall FAIL on F1 (MAJOR).
+Worktree: /data/home/projects/GraviGuard-verify-3, branch work/issue-3-worker-hardening.
+
+## Findings addressed (TDD: red commit → green commit each)
+- F1 MAJOR (prototype pollution via scenario JSON bypassing validateScenario):
+  validateScenario now rejects any params key / timeline param whose dotted
+  segments include __proto__/constructor/prototype (isSafeParamPath). Also closed
+  an inherited-sections bypass: sanitizeAgainstTemplate uses own-enumerable
+  hasOwnProperty checks instead of `key in raw`. Defense in depth at the sink:
+  defaultParamsWith (now exported for tests) walks OWN properties only and
+  assigns only to keys the plant already owns — no prototype access, no
+  unexpected-key injection; unknown/metadata keys ignored (matches applyParam).
+  applyParam itself lives in out-of-scope scenario.ts — untouched; hostile
+  timeline paths are rejected at validation before Timeline construction.
+  Red fa14550: 7 failed / 1 passed on ba05c7d code (all 3 tester variants +
+  pump.__proto__.* + bare __proto__ + inherited params). Green 98fffb1: 11/11.
+  Red-run safety: validation assertions precede processMessage so the failing
+  run never actually pollutes Object.prototype in the test process.
+- F3 MINOR (step path blocks worker ~5 s at 3600 s cap): chose the minimal fix —
+  MAX_STEP_SECONDS 3600 → 10 (1000 steps ≈ 14 ms, inside loop()'s 20 ms frame
+  budget at measured ~14 µs/step). Exact step semantics preserved; UI sends
+  seconds:1 only. Red 0077042: clamp 3600≠10 and max-cap step blocked 5698 ms
+  (independent repro of tester's 4888 ms). Green 9e74e09: both pass, ~14 ms.
+  dt-convergence tests (engine-level + scenario pack) unaffected — all green.
+- F4 MINOR (redundant structuredClone in validatePlantParams): returned
+  sanitized directly (template rebuild is already a fresh deep copy).
+  Efficiency-only, no behavioral red possible; added two-way mutation-isolation
+  test. Green 51617fa; full worker file 42/42.
+- F2 MINOR (App.tsx beyond 4-file ownership): no code change per verdict
+  ("owner confirms ownership; no code change required"). Banner is required for
+  AC4; decision documented above; sanction pending owner. Noted in issue comment.
+- F5 INFO (English banner literal): SKIPPED per task — deferred to issue #7
+  (i18n owner). Noted in issue comment.
+
+## Evidence
+- pnpm test → Test Files 10 passed (10); Tests 135 passed (135); 45.03s (exit 0).
+  Was 122 pre-round; +13 new (F1 11, F3 net +1, F4 +1). Logs:
+  /data/home/.hermes/cache/scratch/fixround-test.log, f1-red.log, f3-red.log.
+- pnpm build → tsc --noEmit && vite build ✓ built in 1.64s (exit 0).
+- Bypass proof: F1 tests fail on the old code path (red run at fa14550 before
+  any src edit, HEAD ba05c7d worker.ts) and pass after 98fffb1.
+- dist/ build artifacts restored (git checkout + rm of new hashed assets);
+  dist removal stays with P1-8. Scope check: git diff main..HEAD unchanged
+  file set — this round touched only src/sim/worker.ts + tests/worker.test.ts.
+
+## Remaining risks
+- applyParam (scenario.ts, out of scope) still walks keys unchecked; safe today
+  because validateScenario rejects hostile paths before Timeline construction,
+  but a future caller bypassing validation would re-expose it. Recommend
+  scenario.ts hardening under its owning issue.
+- Step cap 10 s is a behavior change for hypothetical >10 s step callers (none
+  exist in-repo; UI sends 1 s). Chunking across frames was rejected as
+  non-minimal (breaks synchronous processMessage contract).
+- F2 ownership sanction and F5 i18n remain open with their owners (#7 / repo owner).
