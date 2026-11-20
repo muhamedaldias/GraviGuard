@@ -274,6 +274,7 @@ export function Simulator() {
         <div className="panel-title">{t('sim.charts')}</div>
         <div className="col" style={{ gap: 8 }}>
           <ChartRow label={t('sim.margin') + ' / NPSH'}
+            x={chart.t}
             series={[
               { label: 'R', color: 'var(--accent)', data: chart.R, scale: 'y' },
               { label: 'NPSHa', color: 'var(--water)', data: chart.NPSHa, scale: 'y2' },
@@ -281,16 +282,19 @@ export function Simulator() {
             ]}
             hlines={[{ y: 1.6, color: 'var(--watch)', label: 'R=1.6' }]} />
           <ChartRow label={t('sim.flow')}
+            x={chart.t}
             series={[
               { label: 'Q', color: 'var(--water)', data: chart.Q },
               { label: 'speed %', color: 'var(--steel)', data: chart.n.map((x) => x * 100) },
             ]} />
           <ChartRow label={t('sim.tank') + ' / ' + t('sim.valve')}
+            x={chart.t}
             series={[
               { label: 'tank', color: 'var(--accent)', data: chart.tank },
               { label: 'valve', color: 'var(--warning)', data: chart.theta.map((x) => x * 10) },
             ]} />
           <ChartRow label={t('sim.vibration') + ' / ' + t('sim.damage')}
+            x={chart.t}
             series={[
               { label: 'vib', color: 'var(--watch)', data: chart.vib },
               { label: 'damage', color: 'var(--critical)', data: chart.dmg },
@@ -336,11 +340,11 @@ function GaugeBox({ label, value, unit, tone }: { label: string; value: string; 
   );
 }
 
-function ChartRow({ label, series, hlines }: { label: string; series: ChartSeries[]; hlines?: { y: number; color: string; label?: string }[] }) {
+function ChartRow({ label, x, series, hlines }: { label: string; x: number[]; series: ChartSeries[]; hlines?: { y: number; color: string; label?: string }[] }) {
   return (
     <div>
       <div className="small muted" style={{ marginBottom: 2 }}>{label}</div>
-      <StripChart series={series} height={120} hlines={hlines} />
+      <StripChart x={x} series={series} height={120} hlines={hlines} />
     </div>
   );
 }
