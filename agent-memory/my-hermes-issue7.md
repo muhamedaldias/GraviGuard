@@ -3,8 +3,9 @@ agent: hermes
 machine: my
 issue: 7
 branch: work/issue-7-i18n-parity
-status: in-progress
-updated: 2026-11-20T00:32:00Z
+status: done
+updated: 2026-11-20T00:32:31Z
+pr: https://github.com/muhamedaldias/GraviGuard/pull/14
 ---
 
 # Understanding
@@ -138,3 +139,17 @@ NEXT STEPS (in order):
    0 critical/high target; document residuals. Verify: pnpm test/build/audit + fresh
    clone build. PR "issue-8: dependency upgrades + repo hygiene" + issue comment +
    memory file. pnpm store prune at end if store grew (root fs 90% full).
+
+# Delivery record (final)
+- Commit ac9bc3b feat(i18n): round-1 completeness — catalogue-driven pages and alarm
+  translation (11 files, +612/−100; dist/ intentionally excluded).
+- Pushed work/issue-7-i18n-parity (first push attempt transiently remote-rejected;
+  retry succeeded — verified new branch on origin).
+- PR #14 OPEN against main: https://github.com/muhamedaldias/GraviGuard/pull/14
+  (gh pr view verified: +612/−100, 11 files, title "issue-7: i18n completeness (round-1)").
+- Issue comment: https://github.com/muhamedaldias/GraviGuard/issues/7#issuecomment-7026424471
+  (starts "agent:hermes machine:my", 5 lines).
+- Tracked dist/ churn restored (git checkout -- dist); one untracked build artifact
+  dist/assets/index-Dyq5-sS-.js left in place (becomes ignored in issue #8).
+- pnpm store measured 2.0G — prune after issue #8 upgrades.
+- ISSUE #7 DONE. Next: issue #8 per Handoff step 7 (fresh branch from origin/main).
