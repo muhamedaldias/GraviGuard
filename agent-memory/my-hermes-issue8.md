@@ -4,7 +4,7 @@ machine: my
 issue: 8
 branch: work/issue-8-repo-hygiene
 status: done
-updated: 2026-11-20T01:04:00Z
+updated: 2026-11-20T01:12:00Z
 pr: https://github.com/muhamedaldias/GraviGuard/pull/15
 ---
 
@@ -135,3 +135,23 @@ Do NOT edit any src file. #7 done: PR #14.
   lint exit 0 (0 errors/1 warning), audit "No known vulnerabilities found" exit 0,
   scenarios CLI 20 passed/0 failed, CI YAML parse + command presence OK.
 - ISSUE #8 DONE (pending CI green confirmation on PR #15).
+
+# Addendum — main moved mid-work; CI fail→fix→pass
+- saqer PR #13 (issue #6 tour) merged to main (577424f) while #8 was in flight:
+  adds tests/helpers/jsdom-stubs.ts + tests/tour.test.ts (6 tests), App/TourPage changes.
+- Merged origin/main into branch (0e2a2ea, zero conflicts — disjoint files).
+- First CI run FAILED at Lint on the PR merge ref: jsdom-stubs.ts 15× no-explicit-any
+  (saqer's file — not editable by me). Fixed via scoped tests/helpers/** override
+  (ac6d975), documented in config + PR. No other-machine source edits.
+- Post-merge battery: pnpm test 78/78 (7 files, RUN v4.1.12 — tour tests vitest-4
+  compatible as-is), typecheck clean, build ✓ (index-B3t_rSew.js 656.67 kB/gzip 209.52),
+  lint exit 0 (0 errors/1 warning), audit "No known vulnerabilities found".
+- Post-merge fresh clone (scratch/gg-fresh2 @ ac6d975): dist tracked 0, frozen install
+  OK, build ✓, test 78/78 (7 files, v4.1.12); SHA256 == local: index-B3t_rSew.js
+  4b93eead…, index-CIgSCqQV.css 1d4e0edb…. (gg-fresh shallow-update attempt failed —
+  unrelated histories after depth-1 fetch of merge commit; re-cloned instead.)
+- CI LIVE: run 44651305442 → ci PASS 1m18s (install/lint/test/typecheck/build/audit).
+- Commits on branch: 272e4e4 (build/deps+hygiene), 8425a0d (docs), 0e2a2ea (merge main),
+  ac6d975 (lint helpers fix), + final docs commit.
+- pnpm store prune: 0 packages removed (all referenced), store 2.0G unchanged, /data 84%.
+- PR #15 body updated with CI-pass + post-merge evidence. ISSUE #8 FULLY DONE.
