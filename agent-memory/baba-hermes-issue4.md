@@ -3,8 +3,9 @@ agent: hermes
 machine: baba
 issue: 4
 branch: work/issue-4-sensor-synthesis
-status: in-progress
-updated: 2026-11-20T00:18:00Z
+status: done
+updated: 2026-11-20T00:32:00Z
+pr: https://github.com/muhamedaldias/GraviGuard/pull/11
 ---
 
 # Understanding
@@ -91,6 +92,13 @@ quantBits 24 in the noiseless test (half-step 0.006 Pa → 5.9e-7 m < 1e-6).
 - dist/ build artifacts restored, NOT committed (P1-8 owns dist hygiene).
 
 # Handoff
-Children A/B in flight per contract. Next: lead applies S9b assertions, runs full
-suite + baseline R probe (2.30 ± 0.01), reviews diffs, commits, pushes, PR
-"issue-4: sensor estimator synthesis correctness", issue comment, finalize memory.
+DONE. Commit 4985e0e on work/issue-4-sensor-synthesis, pushed. PR #11 OPEN against
+main: https://github.com/muhamedaldias/GraviGuard/pull/11 (title "issue-4: sensor
+estimator synthesis correctness"). Issue comment posted. All 5 acceptance criteria
+verified (unit + headless probes). Both issues delivered this session: #3 → PR #9,
+#4 → PR #11 (disjoint files; both from a7072ff; merge order irrelevant).
+Probe scripts/evidence: /data/home/.hermes/cache/scratch/s9b-pre-probe.ts,
+s9b-pre-change-evidence.txt, s9b-post-change-evidence.txt. Preview server
+proc_0ed38610c01e may still run on :4173 (serves issue-3-era dist; kill by port).
+If a fresh session resumes: nothing pending on #3/#4; next roadmap items belong to
+other machines unless reassigned.
