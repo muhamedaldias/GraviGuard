@@ -208,7 +208,10 @@ export function validatePlantParams(raw: unknown): PlantParams | null {
   const template = defaultPlant() as unknown as Record<string, unknown>;
   const sanitized = sanitizeAgainstTemplate(raw as Record<string, unknown>, template);
   if (sanitized === null) return null;
-  return structuredClone(sanitized) as unknown as PlantParams;
+  // verdict-issue3 F4: sanitizeAgainstTemplate already builds a fresh deep
+  // copy (new objects at every level, primitive leaves only) — an extra
+  // structuredClone here was redundant work.
+  return sanitized as unknown as PlantParams;
 }
 
 function validateScenario(raw: unknown): Scenario | string {

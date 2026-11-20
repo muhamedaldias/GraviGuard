@@ -446,6 +446,21 @@ describe('validatePlantParams (template-based sanitization)', () => {
     expect(out!.pump).not.toBe(p.pump);
   });
 
+  // verdict-issue3 F4: the redundant structuredClone was dropped; the
+  // template rebuild alone must fully isolate output from input.
+  it('returned params share no references with the input (both directions)', () => {
+    const p = defaultPlant();
+    const out = validatePlantParams(p)!;
+    out.pump.Q_BEP = 12345;
+    expect(p.pump.Q_BEP).not.toBe(12345);
+    p.fluid.rho = 999;
+    expect(out.fluid.rho).not.toBe(999);
+    out.sensors.faults.pressureDrift = 0.5;
+    expect(p.sensors.faults.pressureDrift).not.toBe(0.5);
+    out.sensors.faults.pressureStuck = true;
+    expect(p.sensors.faults.pressureStuck).not.toBe(true);
+  });
+
   it('drops extra keys', () => {
     const p = defaultPlant() as unknown as Record<string, unknown>;
     p.extra = 123;
