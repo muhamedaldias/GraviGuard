@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useApp, type PageId } from './state/store';
 import { useSimLifecycle, simSend } from './hooks/sim';
@@ -18,10 +18,10 @@ import { MonteCarloPage } from './pages/MonteCarloPage';
 import { ScenariosPage } from './pages/ScenariosPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { MethodologyPage } from './pages/MethodologyPage';
-import { TourPage } from './pages/TourPage';
+import { TourPage, TOUR_STEPS } from './pages/TourPage';
 import { SettingsPage } from './pages/SettingsPage';
 
-const PAGES: { id: PageId; labelKey: string; component: React.ComponentType }[] = [
+const PAGES: { id: PageId; labelKey: string; component: React.ComponentType | null }[] = [
   { id: 'landing', labelKey: 'nav.landing', component: Landing },
   { id: 'simulator', labelKey: 'nav.simulator', component: Simulator },
   { id: 'curves', labelKey: 'nav.curves', component: Curves },
@@ -36,7 +36,7 @@ const PAGES: { id: PageId; labelKey: string; component: React.ComponentType }[] 
   { id: 'scenarios', labelKey: 'nav.scenarios', component: ScenariosPage },
   { id: 'reports', labelKey: 'nav.reports', component: ReportsPage },
   { id: 'methodology', labelKey: 'nav.methodology', component: MethodologyPage },
-  { id: 'tour', labelKey: 'nav.tour', component: TourPage },
+  { id: 'tour', labelKey: 'nav.tour', component: null },
   { id: 'settings', labelKey: 'nav.settings', component: SettingsPage },
 ];
 
@@ -71,7 +71,23 @@ export default function App() {
   }, [lang, setLang]);
 
   const active = useMemo(() => PAGES.find((p) => p.id === page) ?? PAGES[0], [page]);
-  const ActiveComponent = active.component;
+  // While touring, the tour panel overlays the step's target page; the tour
+  // itself never navigates away (store.page stays 'tour').
+  const [tourIdx, setTourIdx] = useState(0);
+  const [tourPlaying, setTourPlaying] = useState(false);
+  useEffect(() => {
+    if (page === 'tour') {
+      setTourIdx(0);
+      setTourPlaying(false);
+    }
+  }, [page]);
+  const exitTour = useCallback(() => {
+    setTourPlaying(false);
+    setTourIdx(0);
+    setPage('landing');
+  }, [setPage]);
+  const targetId = page === 'tour' ? TOUR_STEPS[tourIdx].page : active.id;
+  const ActiveComponent = (PAGES.find((p) => p.id === targetId) ?? PAGES[0]).component ?? Landing;
 
   return (
     <div className="app-shell">
@@ -88,6 +104,7 @@ export default function App() {
             <button
               key={p.id}
               className={`nav-link ${p.id === page ? 'active' : ''}`}
+              aria-current={p.id === page ? 'page' : undefined}
               onClick={() => setPage(p.id)}
             >
               {t(p.labelKey)}
@@ -110,6 +127,15 @@ export default function App() {
 
       <main className="content">
         <ActiveComponent />
+        {page === 'tour' && (
+          <TourPage
+            idx={tourIdx}
+            playing={tourPlaying}
+            onIdx={setTourIdx}
+            onPlaying={setTourPlaying}
+            onExit={exitTour}
+          />
+        )}
       </main>
 
       <footer className="footer">

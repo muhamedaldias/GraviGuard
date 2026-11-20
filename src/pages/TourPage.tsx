@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useApp } from '../state/store';
+import { useApp, type PageId } from '../state/store';
 import type { Scenario } from '../sim/types';
 
-interface TourStep {
+export interface TourStep {
   titleKey: string;
   bodyKey: string;
   scenarioId?: string;
-  page: string;
+  page: PageId;
 }
 
-const STEPS: TourStep[] = [
+export const TOUR_STEPS: TourStep[] = [
   { titleKey: 't1', bodyKey: 'b1', scenarioId: 'S0', page: 'simulator' },
   { titleKey: 't2', bodyKey: 'b2', scenarioId: 'S1', page: 'simulator' },
   { titleKey: 't3', bodyKey: 'b3', page: 'twin' },
@@ -47,68 +47,110 @@ const STRINGS: Record<string, { en: string; ar: string }> = {
   },
 };
 
-export function TourPage() {
-  const { t, i18n } = useTranslation();
-  const setPage = useApp((s) => s.setPage);
-  const setScenario = useApp((s) => s.setScenario);
-  const [idx, setIdx] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const step = STEPS[idx];
+interface TourPageProps {
+  idx: number;
+  playing: boolean;
+  onIdx: (i: number) => void;
+  onPlaying: (p: boolean) => void;
+  onExit: () => void;
+}
 
+/**
+ * Guided tour overlay panel. Rendered by App ON TOP of the target page while
+ * store.page === 'tour'. It never navigates itself: App owns the page state and
+ * renders TOUR_STEPS[idx].page underneath, so the panel stays mounted across
+ * steps. Scenario loading still happens here (store.setScenario → worker init).
+ */
+export function TourPage({ idx, playing, onIdx, onPlaying, onExit }: TourPageProps) {
+  const { t, i18n } = useTranslation();
+  const setScenario = useApp((s) => s.setScenario);
+  const step = TOUR_STEPS[idx];
+  const lang = i18n.language === 'ar' ? 'ar' : 'en';
+
+  // Auto-advance: 8 s per step; stop at the last step.
   useEffect(() => {
     if (!playing) return;
     const timer = setTimeout(() => {
-      if (idx < STEPS.length - 1) setIdx(idx + 1);
-      else setPlaying(false);
+      if (idx < TOUR_STEPS.length - 1) onIdx(idx + 1);
+      else onPlaying(false);
     }, 8000);
     return () => clearTimeout(timer);
-  }, [playing, idx]);
+  }, [playing, idx, onIdx, onPlaying]);
 
+  // Load the step's scenario into the store (the sim lifecycle hook forwards it
+  // to the worker, resetting the plant). No scenario → default init.
   useEffect(() => {
-    setPage(step.page as never);
     if (step.scenarioId) {
+      let cancelled = false;
       fetch(`./scenarios/${step.scenarioId}.json`)
         .then((r) => r.json())
-        .then((sc: Scenario) => setScenario(sc))
-        .catch(() => setScenario(null));
-    } else {
-      setScenario(null);
+        .then((sc: Scenario) => {
+          if (!cancelled) setScenario(sc);
+        })
+        .catch(() => {
+          if (!cancelled) setScenario(null);
+        });
+      return () => {
+        cancelled = true;
+      };
     }
-  }, [idx, step, setPage, setScenario]);
+    setScenario(null);
+  }, [idx, step, setScenario]);
 
   return (
-    <div className="col" style={{ gap: 12, maxWidth: 760, margin: '0 auto' }}>
+    <div
+      data-testid="tour-panel"
+      className="col"
+      style={{
+        gap: 12,
+        position: 'fixed',
+        insetInlineEnd: 16,
+        bottom: 16,
+        width: 'min(440px, calc(100vw - 32px))',
+        maxHeight: 'calc(100vh - 120px)',
+        overflowY: 'auto',
+        zIndex: 40,
+        padding: 12,
+        borderRadius: 12,
+        background: 'var(--bg-1)',
+        border: '1px solid var(--line)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+      }}
+    >
       <div className="panel">
         <h2 style={{ margin: 0, fontSize: 18 }}>{t('tour.title')}</h2>
         <p className="muted small" style={{ margin: '4px 0 0' }}>{t('tour.script')} · 5 min</p>
       </div>
       <div className="panel" style={{ minHeight: 200 }}>
         <div className="row" style={{ alignItems: 'center', gap: 8 }}>
-          <span className="mono" style={{ color: 'var(--accent)' }}>{idx + 1}/{STEPS.length}</span>
-          <h3 style={{ margin: 0 }}>{STRINGS[step.titleKey][i18n.language === 'ar' ? 'ar' : 'en']}</h3>
+          <span className="mono" style={{ color: 'var(--accent)' }}>{idx + 1}/{TOUR_STEPS.length}</span>
+          <h3 style={{ margin: 0 }}>{STRINGS[step.titleKey][lang]}</h3>
         </div>
+        <p className="small muted" style={{ margin: '6px 0 0' }}>
+          {step.page} · {step.scenarioId ?? 'default'}
+        </p>
         <p style={{ marginTop: 12, lineHeight: 1.6 }}>
-          {STRINGS[step.bodyKey][i18n.language === 'ar' ? 'ar' : 'en']}
+          {STRINGS[step.bodyKey][lang]}
         </p>
         <div className="row" style={{ marginTop: 16 }}>
-          <button className="primary" onClick={() => setPlaying((p) => !p)}>
+          <button className="primary" onClick={() => onPlaying(!playing)}>
             {playing ? t('common.pause') : t('tour.start')}
           </button>
-          <button onClick={() => setIdx((i) => Math.max(0, i - 1))} disabled={idx === 0}>
+          <button onClick={() => onIdx(Math.max(0, idx - 1))} disabled={idx === 0}>
             {t('tour.prev')}
           </button>
-          <button onClick={() => setIdx((i) => Math.min(STEPS.length - 1, i + 1))} disabled={idx === STEPS.length - 1}>
+          <button onClick={() => onIdx(Math.min(TOUR_STEPS.length - 1, idx + 1))} disabled={idx === TOUR_STEPS.length - 1}>
             {t('tour.next')}
           </button>
-          <button onClick={() => { setIdx(0); setPlaying(false); }}>{t('tour.exit')}</button>
+          <button onClick={onExit}>{t('tour.exit')}</button>
         </div>
       </div>
       <div className="panel">
         <div className="panel-title">{t('tour.script')}</div>
-        {STEPS.map((s, i) => (
+        {TOUR_STEPS.map((s, i) => (
           <div key={i} className="row" style={{ gap: 8, padding: '4px 0', opacity: i === idx ? 1 : 0.6 }}>
             <span className="mono small">{i + 1}</span>
-            <span className="small">{STRINGS[s.titleKey][i18n.language === 'ar' ? 'ar' : 'en']}</span>
+            <span className="small">{STRINGS[s.titleKey][lang]}</span>
           </div>
         ))}
       </div>
