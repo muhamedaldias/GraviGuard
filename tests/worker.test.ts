@@ -302,6 +302,88 @@ describe('worker inbound validation + error channel', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// verdict-issue3 finding F1 (MAJOR): prototype pollution via scenario JSON.
+// Repro of the tester's three bypass variants + an inherited-keys variant.
+// Hostile payloads are built with JSON.parse so "__proto__" is an OWN
+// enumerable key — exactly the shape a fetch()'d scenario asset would have.
+// Validation-level assertions come FIRST so a red run fails before any
+// assignment sink can actually pollute Object.prototype in this process.
+// ---------------------------------------------------------------------------
+describe('scenario injection hardening (verdict-issue3 F1)', () => {
+  const origToString = Object.prototype.toString;
+  const origValueOf = Object.prototype.valueOf;
+  const origHasOwn = Object.prototype.hasOwnProperty;
+
+  const base = {
+    id: 'evil',
+    name: '',
+    nameAr: '',
+    description: '',
+    descriptionAr: '',
+    tags: [],
+    duration: 10,
+    seed: 1,
+    mode: 'ON',
+  };
+
+  function expectPrototypeIntact(): void {
+    expect(Object.prototype.toString).toBe(origToString);
+    expect(Object.prototype.valueOf).toBe(origValueOf);
+    expect(Object.prototype.hasOwnProperty).toBe(origHasOwn);
+    expect({}.toString()).toBe('[object Object]');
+    expect(Object.prototype.hasOwnProperty.call({}, 'polluted')).toBe(false);
+  }
+
+  const hostileParamsPayloads = [
+    '{"__proto__.toString": 1}',
+    '{"constructor.prototype.hasOwnProperty": 1}',
+    '{"pump.__proto__.polluted": 1}',
+    '{"__proto__": 1}',
+  ];
+
+  for (const payload of hostileParamsPayloads) {
+    it(`rejects scenario.params ${payload} and leaves Object.prototype untouched`, () => {
+      const scenario = { ...base, params: JSON.parse(payload) };
+      const v = validateInbound({ type: 'scenario', scenario });
+      expect(v.ok).toBe(false);
+      expectError(processMessage({ type: 'scenario', scenario }));
+      expectPrototypeIntact();
+    });
+  }
+
+  const hostileTimelineParams = ['__proto__.valueOf', 'constructor.prototype.hasOwnProperty'];
+
+  for (const param of hostileTimelineParams) {
+    it(`rejects timeline param ${param} and leaves Object.prototype untouched`, () => {
+      const scenario = { ...base, timeline: [{ t: 0.05, param, value: 1 }] };
+      const v = validateInbound({ type: 'scenario', scenario });
+      expect(v.ok).toBe(false);
+      expectError(processMessage({ type: 'scenario', scenario }));
+      expectPrototypeIntact();
+    });
+  }
+
+  it('rejects plant params whose sections are only inherited (own-enumerable check)', () => {
+    // `key in raw` walks the prototype chain: an object with NO own keys but
+    // defaultPlant() as its prototype must not pass template validation.
+    const inherited = Object.create(defaultPlant()) as Record<string, unknown>;
+    expect(Object.keys(inherited)).toHaveLength(0);
+    expect(validatePlantParams(inherited)).toBeNull();
+    expectError(processMessage({ type: 'params', params: inherited }));
+    expectPrototypeIntact();
+  });
+
+  it('still accepts a legitimate scenario with dotted plant params', () => {
+    const scenario = { ...base, params: { 'tank.V_usable': 250 } };
+    const v = validateInbound({ type: 'scenario', scenario });
+    expect(v.ok).toBe(true);
+    const out = processMessage({ type: 'scenario', scenario });
+    expect(out.map((m) => m.type)).toEqual(['ready', 'snapshot']);
+    expectPrototypeIntact();
+  });
+});
+
 describe('validatePlantParams (template-based sanitization)', () => {
   it('accepts a full default plant and returns a fresh clone', () => {
     const p = defaultPlant();
