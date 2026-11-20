@@ -3,8 +3,9 @@ agent: hermes
 machine: saqer
 issue: 6
 branch: work/issue-6-guided-tour
-status: in-progress
-updated: 2026-11-20T00:55:00Z
+status: done
+updated: 2026-11-20T01:00:00Z
+pr: https://github.com/muhamedaldias/GraviGuard/pull/13
 ---
 
 # Understanding
@@ -71,5 +72,6 @@ numbering (issue-5); user TASK overrides → issue-6 branch/memory. Branch from 
   right of target page on small viewports (fixed panel, scrollable, max-height capped).
 
 # Handoff
-Code complete + fully verified; next: commit, push, PR "issue-6: guided tour works",
-≤5-line issue comment starting "agent:hermes machine:saqer", finalize this file (done).
+DONE. Commit pushed on work/issue-6-guided-tour; PR #13 OPEN against main (+461/−35,
+verified via gh pr view); issue comment posted (issuecomment-7026416798).
+Both assigned issues delivered: #5 → PR #10, #6 → PR #13. No further scope on saqer.
