@@ -477,8 +477,12 @@ export class SimEngine {
     // --- Sensors ---------------------------------------------------------
     const A_s = suctionArea(p);
     const V_s = s.Q / A_s;
-    const P_suction_abs = (s.NPSHa + PvHead) * rho * G;
-    const P_discharge = p.fluid.Patm + rho * G * s.H_pump;
+    // STATIC flange pressure: NPSHa includes the velocity head, so subtract it
+    // here — the estimator adds it back exactly once from measured flow
+    // (convention documented in METHODOLOGY §2.6).
+    const P_suction_abs = (s.NPSHa + PvHead - velocityHead(s.Q, p)) * rho * G;
+    // Discharge pressure is synthesized across the pump from the suction side.
+    const P_discharge = P_suction_abs + rho * G * s.H_pump;
     const strainerDP = rho * p.suction.K_strainer * V_s * V_s * 0.5;
     const m = updateSensors(
       this.sensors,
@@ -493,6 +497,9 @@ export class SimEngine {
         theta: s.theta,
         vibration: vibTruth,
         n: this.nEff,
+        H_pump: s.H_pump,
+        rho,
+        Patm: p.fluid.Patm,
       },
       p.sensors,
       this.rng,
