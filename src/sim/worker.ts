@@ -128,7 +128,12 @@ const NUMERIC_INPUT_KEYS = [
 ];
 const BOOLEAN_INPUT_KEYS = ['valveStuck', 'pressureStuck', 'pressureDropout', 'checkValveLeak'];
 
-const MAX_STEP_SECONDS = 3600;
+// verdict-issue3 F3: 'step' runs its n = seconds/PHYSICS_DT steps synchronously.
+// The old 3600 s cap allowed 360000 steps ≈ 5 s of blocked worker (no snapshots,
+// no message processing). 10 s = 1000 steps keeps the worst-case block inside
+// loop()'s 20 ms frame budget at the measured ~14 µs/step; the UI only ever
+// sends seconds: 1 (Simulator.tsx), so legitimate use is unaffected.
+const MAX_STEP_SECONDS = 10;
 const MIN_SPEED = 0.25;
 const MAX_SPEED = 200;
 
