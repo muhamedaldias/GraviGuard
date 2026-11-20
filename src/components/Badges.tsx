@@ -7,6 +7,25 @@ export function Badge({ children, tone }: { children: React.ReactNode; tone?: 's
   return <span className={`badge ${tone ?? ''}`}>{children}</span>;
 }
 
+/**
+ * Controller alarms arrive from src/sim/controller.ts as raw message strings
+ * (engine alarm ids stay stable). Map each known message to a catalogue key so
+ * the UI renders through t(); unknown future messages fall back to raw text.
+ */
+export const CTRL_ALARM_KEYS: Record<string, string> = {
+  'Tank at reserve — injection blocked, VFD fallback': 'alarm.ctrl-tank',
+  'Valve fault detected — GraviGuard unavailable': 'alarm.ctrl-valve',
+  'Sensor fault detected — fail-safe active': 'alarm.ctrl-sensor',
+  'Injection cycle limit exceeded (3/hour)': 'alarm.ctrl-cycles',
+};
+
+export function ControllerAlarmBadge({ message }: { message: string | null }) {
+  const { t } = useTranslation();
+  if (!message) return null;
+  const key = CTRL_ALARM_KEYS[message];
+  return <Badge tone="critical">{key ? t(key) : message}</Badge>;
+}
+
 export function SyntheticBadge() {
   const { t } = useTranslation();
   return <Badge tone="synthetic">{t('common.synthetic')}</Badge>;

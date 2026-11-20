@@ -33,7 +33,7 @@ export function SensorsPage() {
       <div className="panel">
         <h2 style={{ margin: 0, fontSize: 18 }}>{t('sensors.title')}</h2>
         <p className="muted small" style={{ margin: '4px 0 0' }}>
-          {t('sensors.truth')} vs {t('sensors.measured')} · NPSHa
+          {t('sensors.truth')} {t('sensors.vs')} {t('sensors.measured')} · NPSHa
         </p>
       </div>
 
@@ -97,7 +97,7 @@ export function SensorsPage() {
               </div>
             </label>
             <label>
-              <span className="small muted">{t('sensors.quant')} (bits)</span>
+              <span className="small muted">{t('sensors.quant')} ({t('sensors.bits')})</span>
               <div className="slider-row">
                 <input type="range" min={8} max={16} step={1} value={params.sensors.quantBits}
                   onChange={(e) => {
@@ -118,7 +118,7 @@ export function SensorsPage() {
           <button onClick={() => simSend({ type: 'input', key: 'pressureDrift', value: 30000 })}>{t('sensors.drift')} +30 kPa</button>
           <button onClick={() => simSend({ type: 'input', key: 'pressureStuck', value: true })}>{t('sensors.stuck')}</button>
           <button onClick={() => simSend({ type: 'input', key: 'pressureDropout', value: true })}>{t('sensors.dropout')}</button>
-          <button onClick={() => simSend({ type: 'input', key: 'checkValveLeak', value: true })}>CV leak</button>
+          <button onClick={() => simSend({ type: 'input', key: 'checkValveLeak', value: true })}>{t('sim.cvLeak')}</button>
           <button onClick={() => {
             simSend({ type: 'input', key: 'pressureDrift', value: 0 });
             simSend({ type: 'input', key: 'pressureStuck', value: false });
