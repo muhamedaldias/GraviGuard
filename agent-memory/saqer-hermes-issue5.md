@@ -3,8 +3,9 @@ agent: hermes
 machine: saqer
 issue: 5
 branch: work/issue-5-stripchart-x
-status: in-progress
-updated: 2026-11-20T00:25:00Z
+status: done
+updated: 2026-11-20T00:30:00Z
+pr: https://github.com/muhamedaldias/GraviGuard/pull/10
 ---
 
 # Understanding
@@ -67,10 +68,6 @@ NOTE: issue body carries stale numbering (issue-4); user TASK overrides → issu
   pixel rendering is verified in browser, not in jsdom.
 
 # Handoff
-Issue #5 code complete + verified; next: commit, push, PR "issue-5: StripChart independent
-variable fix", ≤5-line issue comment, finalize this file (status done). THEN issue #6:
-branch work/issue-6-guided-tour from then-current origin/main; owns TourPage.tsx + App.tsx;
-TourPage self-unmounts via setPage(step.page) in effect (TourPage.tsx:68); acceptance:
-tour stays visible through 5 steps (manual + 8 s auto), scenario loads reset snapshot.t,
-exit sane, re-entry step 1, aria-current="page" on active nav. Preview server proc_df37c886d803
-on :4173 (serves restored OLD dist now — rebuild before issue-6 browser checks).
+DONE. Commit 797c8a2 pushed on work/issue-5-stripchart-x; PR #10 OPEN against main
+(+412/−27, verified via gh pr view); issue comment posted (issuecomment-7026173030).
+Next session task: issue #6 (P0-2 guided tour) — see saqer-hermes-issue6.md.
