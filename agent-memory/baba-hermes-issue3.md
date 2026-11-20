@@ -3,8 +3,9 @@ agent: hermes
 machine: baba
 issue: 3
 branch: work/issue-3-worker-hardening
-status: in-progress
-updated: 2026-11-19T23:57:00Z
+status: done
+updated: 2026-11-20T00:25:00Z
+pr: https://github.com/muhamedaldias/GraviGuard/pull/9
 ---
 
 # Understanding
@@ -82,8 +83,9 @@ engine/timeline/timer/speed/acc/last. Baseline at a7072ff: pnpm test 72/72 pass 
   dist removal); restored with git checkout before branch switch.
 
 # Handoff
-Children A/B implementing per contract above. Next: review their diffs, run
-pnpm test + typecheck + build, browser-verify AC1/2/4 on vite preview :4173,
-commit (conventional), push, PR "issue-3: worker lifecycle + message hardening",
-issue comment ≤5 lines starting "agent:hermes machine:baba", finalize this file.
-Then issue #4 on work/issue-4-sensor-synthesis from origin/main.
+DONE. Commit b505ac6 on work/issue-3-worker-hardening, pushed. PR #9 OPEN against
+main: https://github.com/muhamedaldias/GraviGuard/pull/9 (title "issue-3: worker
+lifecycle + message hardening"). Issue comment posted (issuecomment-7025989809).
+All 5 acceptance criteria verified (unit + browser). Preview server proc_0ed38610c01e
+may still run on :4173 — kill by port if needed. Next: issue #4 on
+work/issue-4-sensor-synthesis from origin/main; see agent-memory/baba-hermes-issue4.md.
