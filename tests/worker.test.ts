@@ -7,8 +7,10 @@ import {
   loop,
   validateInbound,
   validatePlantParams,
+  defaultParamsWith,
 } from '../src/sim/worker';
 import type { WorkerOutbound } from '../src/sim/worker';
+import type { Scenario } from '../src/sim/types';
 import { SimEngine } from '../src/sim/engine';
 import { defaultPlant, PHYSICS_DT } from '../src/sim/defaults';
 import type { SimState } from '../src/sim/types';
@@ -380,6 +382,35 @@ describe('scenario injection hardening (verdict-issue3 F1)', () => {
     expect(v.ok).toBe(true);
     const out = processMessage({ type: 'scenario', scenario });
     expect(out.map((m) => m.type)).toEqual(['ready', 'snapshot']);
+    expectPrototypeIntact();
+  });
+
+  // Sink-level defense in depth: even if validation were bypassed, the
+  // assignment walk itself must not reach prototypes or inject new keys.
+  function scenarioWithParams(params: Record<string, unknown>): Scenario {
+    return { ...base, params } as unknown as Scenario;
+  }
+
+  it('defaultParamsWith applies legitimate dotted plant keys', () => {
+    const p = defaultParamsWith(scenarioWithParams({ 'tank.V_usable': 250, 'valve.strokeTime': 3 }));
+    expect(p.tank.V_usable).toBe(250);
+    expect(p.valve.strokeTime).toBe(3);
+  });
+
+  it('defaultParamsWith ignores unknown keys instead of injecting them', () => {
+    const p = defaultParamsWith(
+      scenarioWithParams(JSON.parse('{"pump.bogus": 1, "nope.deep.key": 2, "tank.V_usable": 250}')),
+    );
+    expect(Object.prototype.hasOwnProperty.call(p.pump, 'bogus')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(p, 'nope')).toBe(false);
+    expect(p.tank.V_usable).toBe(250);
+  });
+
+  it('defaultParamsWith cannot pollute prototypes even if validation is bypassed', () => {
+    const hostile = JSON.parse(
+      '{"__proto__.toString": 1, "constructor.prototype.hasOwnProperty": 1, "pump.__proto__.polluted": 1}',
+    );
+    defaultParamsWith(scenarioWithParams(hostile));
     expectPrototypeIntact();
   });
 });

@@ -136,6 +136,18 @@ function isFiniteNumber(v: unknown): v is number {
   return typeof v === 'number' && Number.isFinite(v);
 }
 
+const hasOwn = (o: object, k: string): boolean => Object.prototype.hasOwnProperty.call(o, k);
+
+// verdict-issue3 F1: dotted param paths are walked by assignment sinks
+// (defaultParamsWith here, applyParam in scenario.ts). A segment naming a
+// prototype chain entry turns a finite value into prototype pollution, so
+// such paths are rejected at the validation boundary.
+const FORBIDDEN_PATH_SEGMENTS = new Set(['__proto__', 'constructor', 'prototype']);
+
+function isSafeParamPath(key: string): boolean {
+  return key.split('.').every((seg) => !FORBIDDEN_PATH_SEGMENTS.has(seg));
+}
+
 function isMode(v: unknown): v is 'OFF' | 'ON' | 'MANUAL' {
   return typeof v === 'string' && MODES.includes(v);
 }
@@ -155,7 +167,9 @@ function sanitizeAgainstTemplate(
 ): Record<string, unknown> | null {
   const out: Record<string, unknown> = {};
   for (const key of Object.keys(template)) {
-    if (!(key in raw)) return null;
+    // Own-enumerable only: `key in raw` would accept inherited sections
+    // (verdict-issue3 F1 — prototype-chain bypass of the template check).
+    if (!hasOwn(raw, key)) return null;
     const tv = template[key];
     const rv = raw[key];
     if (typeof tv === 'number') {
@@ -210,6 +224,9 @@ function validateScenario(raw: unknown): Scenario | string {
       return 'scenario: params must be a record of finite numbers';
     }
     for (const [k, v] of Object.entries(s.params as Record<string, unknown>)) {
+      if (!isSafeParamPath(k)) {
+        return `scenario: params key "${k}" contains a forbidden path segment (__proto__/constructor/prototype)`;
+      }
       if (!isFiniteNumber(v)) return `scenario: params.${k} must be a finite number`;
     }
   }
@@ -225,6 +242,9 @@ function validateScenario(raw: unknown): Scenario | string {
       }
       if (typeof ev.param !== 'string' || ev.param.length === 0) {
         return 'scenario: timeline event param must be a non-empty string';
+      }
+      if (!isSafeParamPath(ev.param)) {
+        return `scenario: timeline param "${ev.param}" contains a forbidden path segment (__proto__/constructor/prototype)`;
       }
       if (!isFiniteNumber(ev.value)) {
         return 'scenario: timeline event value must be a finite number';
@@ -396,20 +416,29 @@ if (typeof self !== 'undefined') {
 
 // Local import indirection to keep the worker bundle small.
 import { defaultPlant } from './defaults';
-function defaultParamsWith(scenario: Scenario): PlantParams {
-  const p = defaultPlant();
+/** Build plant params from a validated scenario's dotted overrides.
+ *  Exported for sink-level regression tests (verdict-issue3 F1).
+ *  Defense in depth: even if a hostile path ever slipped past validation,
+ *  the walk only follows OWN object properties and only assigns to keys the
+ *  plant already owns — no prototype access, no unexpected-key injection.
+ *  Unknown/metadata keys are ignored, matching applyParam's runtime semantics. */
+export function defaultParamsWith(scenario: Scenario): PlantParams {
+  const p = defaultPlant() as unknown as Record<string, unknown>;
   for (const [k, v] of Object.entries(scenario.params ?? {})) {
-    if (k.includes('.')) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const parts = k.split('.');
-        let obj: any = p;
-        for (let i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
-        obj[parts[parts.length - 1]] = v;
-      } catch {
-        /* metadata keys are ignored */
+    if (!k.includes('.') || !isSafeParamPath(k)) continue;
+    const parts = k.split('.');
+    let obj: Record<string, unknown> = p;
+    let ok = true;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const next = hasOwn(obj, parts[i]) ? obj[parts[i]] : undefined;
+      if (next === null || typeof next !== 'object') {
+        ok = false; // metadata / unknown paths are ignored
+        break;
       }
+      obj = next as Record<string, unknown>;
     }
+    const last = parts[parts.length - 1];
+    if (ok && hasOwn(obj, last)) obj[last] = v;
   }
-  return p;
+  return p as unknown as PlantParams;
 }
