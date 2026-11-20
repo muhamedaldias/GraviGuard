@@ -2,7 +2,7 @@
 // Models noise, lag, quantisation, drift, stuck, dropout and spikes, plus
 // 2-out-of-3 pressure voting and plausibility checks.
 
-import { Measurement, SensorParams } from './types';
+import { G, Measurement, SensorParams } from './types';
 import { RngStream } from './prng';
 import { vaporPressurePa } from './fluid';
 import { pumpNPSH3 } from './pump';
@@ -12,6 +12,7 @@ export interface SensorState {
   stuckValue: [number, number, number];
   stuckActive: [boolean, boolean, boolean];
   dropoutHold: [number, number, number];
+  devTimer: [number, number, number];
   t: number;
   q: number;
   level: number;
@@ -27,6 +28,7 @@ export function createSensorState(): SensorState {
     stuckValue: [0, 0, 0],
     stuckActive: [false, false, false],
     dropoutHold: [0, 0, 0],
+    devTimer: [0, 0, 0],
     t: 20,
     q: 0,
     level: 0,
@@ -38,7 +40,7 @@ export function createSensorState(): SensorState {
 }
 
 export interface SensorTruth {
-  P_suction_abs: number;
+  P_suction_abs: number; // STATIC flange pressure (velocity head excluded)
   P_discharge: number;
   Q: number;
   T: number;
@@ -48,9 +50,21 @@ export interface SensorTruth {
   theta: number;
   vibration: number;
   n: number;
+  H_pump: number; // m, pump head at the current operating point
+  rho: number; // kg/m^3
+  Patm: number; // Pa, atmospheric reference for gauge pressure
 }
 
-const FULL_SCALE_PA = 200000; // 0-200 kPa abs ADC range
+export const FULL_SCALE_PA = 200000; // 0-200 kPa abs ADC range
+/** Per-sensor deviation from the 2oo3 median that counts as a fault (Pa). */
+export const DEVIATION_THRESHOLD_PA = 10000;
+/** Sustained deviation time before the sensor is flagged unhealthy (s). */
+export const DEVIATION_HOLD_S = 2.0;
+
+/** Measurement plus per-sensor deviation flags (drift observability, issue #4). */
+export interface SensorMeasurement extends Measurement {
+  pressureDeviation: [boolean, boolean, boolean];
+}
 
 function quantize(value: number, bits: number): number {
   const steps = Math.pow(2, bits);
@@ -75,7 +89,7 @@ export function updateSensors(
   p: SensorParams,
   rng: RngStream,
   dt: number,
-): Measurement {
+): SensorMeasurement {
   const ns = p.noiseScale;
   const raw: [number, number, number] = [0, 0, 0];
   for (let i = 0; i < 3; i++) {
@@ -102,12 +116,22 @@ export function updateSensors(
     } else {
       s.dropoutHold[i] = v;
     }
-    raw[i] = quantize(Math.max(0, v), p.quantBits);
+    raw[i] = quantize(Math.min(FULL_SCALE_PA, Math.max(0, v)), p.quantBits);
   }
   for (let i = 0; i < 3; i++) {
     s.p[i] = lag(s.p[i], raw[i], p.lagP, dt);
   }
   const voted = votePressure(s.p);
+
+  // Per-sensor deviation from the median: a single drifting transmitter is
+  // isolated by the vote, so without this check the fault would be invisible.
+  // Sustained deviation (not single-step spikes) flags the sensor unhealthy.
+  const pressureDeviation: [boolean, boolean, boolean] = [false, false, false];
+  for (let i = 0; i < 3; i++) {
+    if (Math.abs(s.p[i] - voted) > DEVIATION_THRESHOLD_PA) s.devTimer[i] += dt;
+    else s.devTimer[i] = 0;
+    pressureDeviation[i] = s.devTimer[i] >= DEVIATION_HOLD_S;
+  }
 
   s.t = lag(s.t, truth.T + rng.gaussian() * p.sigmaT * ns, 0.5, dt);
   s.q = lag(s.q, truth.Q * (1 + rng.gaussian() * p.sigmaQ * ns), 0.3, dt);
@@ -124,12 +148,13 @@ export function updateSensors(
     s.tank = truth.tankH;
   }
 
-  const healthy = !(p.faults.pressureStuck || p.faults.pressureDropout);
+  const healthy =
+    !(p.faults.pressureStuck || p.faults.pressureDropout) && !pressureDeviation.some(Boolean);
 
   return {
     P_suction_abs: voted,
-    P_suction_gauge: voted - 101325,
-    P_discharge: truth.P_discharge,
+    P_suction_gauge: voted - truth.Patm,
+    P_discharge: voted + truth.rho * G * truth.H_pump,
     Q: Math.max(0, s.q),
     T: s.t,
     level: s.level,
@@ -140,6 +165,7 @@ export function updateSensors(
     n: truth.n,
     healthy,
     voting: [s.p[0], s.p[1], s.p[2]],
+    pressureDeviation,
   };
 }
 
@@ -153,6 +179,8 @@ export interface EstimatorResult {
 /**
  * NPSHa estimator: (P_s,abs - Pv(T_meas))/(rho g) + V_meas^2/2g.
  * Uses only what the controller "sees" (measured pressure, temperature, flow).
+ * Convention (METHODOLOGY §2.6): P_s,abs is the STATIC flange pressure — the
+ * velocity head is added here exactly once, from measured flow.
  */
 export function estimateNPSHa(
   P_abs: number,

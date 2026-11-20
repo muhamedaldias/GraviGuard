@@ -123,10 +123,26 @@ Sensors: suction pressure (σ 0.5 kPa, lag 0.2 s, 12-bit), temperature (σ 0.2 �
 Faults: drift, stuck, dropout, spikes. Three pressure transmitters feed a 2-out-of-3
 median vote.
 
+Pressure synthesis convention: `P_s,abs` is the STATIC pressure at the suction flange,
+`P_s,abs = ρg·(NPSHa + Pv/(ρg) − V²/2g)` — junction head minus junction-to-flange losses
+minus velocity head, plus vapor pressure. The estimator adds the velocity head back
+exactly once, from measured flow, so there is no double count. Discharge pressure is
+synthesized across the pump: `P_discharge = P_s,abs(voted) + ρg·H_pump`. Gauge pressure
+references the configurable atmosphere: `P_s,gauge = P_s,abs(voted) − Patm`
+(`params.fluid.Patm`, not a hardcoded sea-level value). The pressure ADC spans
+0–200 kPa abs (`FULL_SCALE_PA`); readings saturate at both rails before quantization.
+
 Estimator: `NPSHa_est = (P_s,abs − Pv(T_meas))/(ρg) + V_meas²/2g`, `NPSH3_est` from the
 stored curve, `R_est` filtered (τ 1 s). A sustained disagreement between `R_est` and the
 model-based R drives the sensor-health flag; high-frequency vibration rising while R
 looks healthy triggers the "possible non-NPSH mechanism" message.
+
+Drift observability: the 2oo3 vote isolates a single drifting transmitter, which would
+otherwise make the fault invisible. Each transmitter is therefore also checked against
+the median: a lagged reading deviating by more than 10 kPa for ≥ 2 s raises a per-sensor
+deviation flag (`pressureDeviation`), `sensors.healthy` goes false, and the controller
+enters FAULT_SAFE (VFD fallback — the plant keeps running). Scenario S9b demonstrates
+this path; single-step spikes do not latch the flag (hold time + lag attenuation).
 
 ### 2.7 Cavitation, damage and vibration
 

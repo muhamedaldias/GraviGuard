@@ -39,6 +39,16 @@
       "id": "s9b-minR",
       "type": "minR",
       "value": 2
+    },
+    {
+      "id": "s9b-observable",
+      "type": "stateSequence",
+      "expected": ["FAULT_SAFE"]
+    },
+    {
+      "id": "s9b-advisor",
+      "type": "advisorMessage",
+      "expected": ["fault"]
     }
   ],
   "expected": {
