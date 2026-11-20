@@ -3,8 +3,9 @@ agent: hermes
 machine: my
 issue: 8
 branch: work/issue-8-repo-hygiene
-status: in-progress
-updated: 2026-11-20T01:00:00Z
+status: done
+updated: 2026-11-20T01:04:00Z
+pr: https://github.com/muhamedaldias/GraviGuard/pull/15
 ---
 
 # Understanding
@@ -96,11 +97,11 @@ Branch from origin/main@a7072ff (main unmoved; #7 PR #14 open, NOT merged — ba
 - (next) final battery re-run + vite-node CLI smoke + CI YAML parse + fresh-clone build.
 
 # Open issues
-- Fresh-clone identical-build verification pending (after push).
-- vite-node 3.2.4 CLI smoke (pnpm scenarios) pending.
-- CI workflow cannot be executed locally — YAML parse + command-presence check only;
-  first real run happens on the PR (GitHub Actions).
+- CI first live run on PR #15 (run 44650625965) — pending at finalize; local checks
+  all green. If CI fails, read the job log via gh run view and fix forward on the branch.
 - SizingPage lint warning left as documented baseline (P1-5 owns the dead control).
+- src/sim/** lint grandfathering must be re-enabled by sim owners after P0-3/P1-1/P1-4.
+- Codename residuals (ReportsPage gurue-*, store __gurve) deferred to P1-5/P0-3 owners.
 
 # Handoff
 Resume: gh issue view 8 + this file. Remaining: (1) final battery: pnpm test/typecheck/
@@ -116,3 +117,21 @@ vitest-4 rationale, sim grandfathering, codename residuals, SizingPage warning);
 (6) gh issue comment 8 ≤5 lines "agent:hermes machine:my"; (7) finalize this file
 (done+PR), commit docs, push; (8) pnpm store prune (store was 2.0G; root fs 90%).
 Do NOT edit any src file. #7 done: PR #14.
+
+# Delivery record (final)
+- Commit 272e4e4 build(deps): upgrade toolchain (vitest 4.1.12, vite 6.4.6,
+  katex 0.18.11) + repo hygiene — 122 files, +1763/−1518 (incl. 116 dist deletions).
+- Pushed work/issue-8-repo-hygiene to origin (verified new branch).
+- PR #15 OPEN against main: https://github.com/muhamedaldias/GraviGuard/pull/15
+  (gh pr view verified: +1763/−1518, 122 files, title "issue-8: dependency upgrades
+  + repo hygiene"). CI workflow triggered on the PR: run 44650625965, job "ci".
+- Issue comment: https://github.com/muhamedaldias/GraviGuard/issues/8#issuecomment-7027069917
+  (starts "agent:hermes machine:my", 5 lines).
+- Fresh-clone verification (scratch/gg-fresh, cloned from pushed branch): dist ABSENT,
+  git ls-files dist = 0, pnpm install --frozen-lockfile OK, pnpm build ✓,
+  pnpm test 72/72 ✓; SHA256(clone dist) == SHA256(local dist) for index-BUFHhqGs.js
+  (497be553…) and index-CIgSCqQV.css (1d4e0edb…) — byte-identical builds.
+- Final local battery: test 72/72 (vitest 4.1.12), typecheck clean, build ✓ 1.23s,
+  lint exit 0 (0 errors/1 warning), audit "No known vulnerabilities found" exit 0,
+  scenarios CLI 20 passed/0 failed, CI YAML parse + command presence OK.
+- ISSUE #8 DONE (pending CI green confirmation on PR #15).
