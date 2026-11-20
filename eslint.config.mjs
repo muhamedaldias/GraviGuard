@@ -68,6 +68,15 @@ export default tseslint.config(
     },
   },
 
+  // jsdom/canvas environment stubs (tests/helpers, added by issue #6): mocking
+  // window/canvas APIs inherently uses `any`; idiomatic for test stubs.
+  {
+    files: ['tests/helpers/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+
   // Node-side code: tests and build config.
   {
     files: ['tests/**/*.ts', 'vite.config.ts'],
