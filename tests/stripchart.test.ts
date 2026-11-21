@@ -10,8 +10,11 @@ import { createRoot, type Root } from 'react-dom/client';
 import type uPlot from 'uplot';
 import { StripChart, type ChartSeries } from '../src/components/StripChart';
 
+type Ctx2DWithCalls = CanvasRenderingContext2D & { __calls: [string, ...unknown[]][] };
+type PlotRecord = { opts: uPlot.Options; data: uPlot.AlignedData; instance: uPlot };
+
 const { plots } = vi.hoisted(() => ({
-  plots: [] as { opts: any; data: any; instance: any }[],
+  plots: [] as { opts: uPlot.Options; data: uPlot.AlignedData; instance: uPlot }[],
 }));
 
 vi.mock('uplot', async (importOriginal) => {
@@ -39,7 +42,7 @@ const series: ChartSeries[] = [
 let root: Root;
 let container: HTMLDivElement;
 
-async function renderChart(props: any) {
+async function renderChart(props: React.ComponentProps<typeof StripChart>) {
   await act(async () => {
     root.render(React.createElement(StripChart, props));
     // let uPlot's microtask commit + rAF draw run (hooks.ready, legend, cursor)
@@ -110,7 +113,7 @@ describe('StripChart independent variable (issue #5 regression)', () => {
     const inst = plots[0].instance;
     let redraws = 0;
     const origRedraw = inst.redraw.bind(inst);
-    inst.redraw = (...args: any[]) => {
+    inst.redraw = (...args: Parameters<uPlot['redraw']>) => {
       redraws++;
       return origRedraw(...args);
     };
@@ -118,9 +121,10 @@ describe('StripChart independent variable (issue #5 regression)', () => {
     expect(plots.length).toBe(1); // no rebuild
     expect(redraws).toBeGreaterThanOrEqual(1); // hlines change triggered a redraw
     // The draw hook must read the LATEST hlines, not a stale closure.
-    inst.ctx.__calls.length = 0;
+    const ctx = inst.ctx as Ctx2DWithCalls;
+    ctx.__calls.length = 0;
     plots[0].opts.hooks.draw[0](inst);
-    const texts = inst.ctx.__calls.filter((c: any[]) => c[0] === 'fillText').map((c: any[]) => c[1]);
+    const texts = ctx.__calls.filter((c) => c[0] === 'fillText').map((c) => c[1]);
     expect(texts).toContain('B');
     expect(texts).not.toContain('A');
   });
