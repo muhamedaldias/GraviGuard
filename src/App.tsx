@@ -4,6 +4,7 @@ import { useApp, type PageId } from './state/store';
 import { useSimLifecycle, simSend } from './hooks/sim';
 import { LANGS } from './i18n';
 import { SyntheticBadge } from './components/Badges';
+import { useHashRoute } from './state/hashRoute';
 import { Landing } from './pages/Landing';
 import { Simulator } from './pages/Simulator';
 import { Curves } from './pages/Curves';
@@ -56,6 +57,7 @@ export default function App() {
   const workerError = useApp((s) => s.workerError);
 
   useSimLifecycle();
+  useHashRoute(page, setPage);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
