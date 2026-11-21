@@ -5,7 +5,7 @@ import { simSend } from '../hooks/sim';
 import { SimEngine } from '../sim/engine';
 import { CTRL_STATES, type StrategyId } from '../sim/types';
 import { formatNumber } from '../sim/units';
-import { StateBadge, Badge } from '../components/Badges';
+import { StateBadge, ControllerAlarmBadge } from '../components/Badges';
 
 const STATE_COLORS: Record<string, string> = {
   IDLE: 'var(--text-2)',
@@ -106,7 +106,7 @@ export function ControllerPage() {
           </div>
           <div style={{ marginTop: 10 }}>
             <StateBadge name={current} />
-            {snapshot?.controller.alarm && <Badge tone="critical">{snapshot.controller.alarm}</Badge>}
+            <ControllerAlarmBadge message={snapshot?.controller.alarm ?? null} />
           </div>
         </div>
 
@@ -148,7 +148,7 @@ export function ControllerPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ textAlign: 'start', color: 'var(--text-2)' }}>
-              <th style={{ padding: 6, borderBottom: '1px solid var(--line)' }}>Strategy</th>
+              <th style={{ padding: 6, borderBottom: '1px solid var(--line)' }}>{t('controller.strategy')}</th>
               <th style={{ padding: 6, borderBottom: '1px solid var(--line)' }}>{t('twin.minR')}</th>
               <th style={{ padding: 6, borderBottom: '1px solid var(--line)' }}>{t('twin.damage')}</th>
               <th style={{ padding: 6, borderBottom: '1px solid var(--line)' }}>{t('controller.tankUse')}</th>

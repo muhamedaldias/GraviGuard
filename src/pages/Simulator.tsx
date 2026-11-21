@@ -208,7 +208,7 @@ export function Simulator() {
               onClick={() => simSend({ type: 'input', key: 'pressureDrift', value: 30000 })} />
             <FaultToggle label={t('sensors.dropout')} active={false}
               onClick={() => simSend({ type: 'input', key: 'pressureDropout', value: true })} />
-            <FaultToggle label="CV leak" active={false}
+            <FaultToggle label={t('sim.cvLeak')} active={false}
               onClick={() => simSend({ type: 'input', key: 'checkValveLeak', value: true })} />
           </div>
         </div>

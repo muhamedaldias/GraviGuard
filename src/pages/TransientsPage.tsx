@@ -77,7 +77,7 @@ export function TransientsPage() {
             {roRamp > roLimit ? <Badge tone="critical">{t('transients.roLimit')} ≈ {roLimit} bar/s — {t('common.fail')}</Badge> : <Badge tone="safe">{t('transients.roLimit')} — {t('common.pass')}</Badge>}
           </div>
           <p className="small muted" style={{ marginTop: 10 }}>
-            {roFeed} bar feed · +{roLift} bar lift · magnitude &lt; 1 % · ramp governs the valve stroke.
+            {t('transients.roSummary', { feed: roFeed, lift: roLift })}
           </p>
         </div>
       </div>
