@@ -3,7 +3,6 @@
 // real CTA, and the hash route mirrors the store page ('#/' on first render).
 import './helpers/jsdom-stubs';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import React from 'react';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
