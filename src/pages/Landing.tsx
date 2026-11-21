@@ -2,10 +2,28 @@ import { useTranslation } from 'react-i18next';
 import { useApp } from '../state/store';
 import { SyntheticBadge } from '../components/Badges';
 import { STATIONS } from '../data/stations';
-import '../styles/landing.css';
+import './landing.css';
 
 /** Nominal display values when the engine has not ticked yet. */
 const NOMINAL = { q: 0.142, npsha: 6.4, npsh3: 5.56, level: 3.2 };
+
+function Gauge({ label, value, unit }: { label: string; value: string; unit?: string }) {
+  return (
+    <div className="gauge">
+      <svg className="gauge-dial" viewBox="0 0 56 56" aria-hidden="true">
+        <circle cx="28" cy="28" r="22" className="gauge-track" />
+        <circle cx="28" cy="28" r="22" className="gauge-tick" />
+        <line x1="28" y1="28" x2="28" y2="10" className="gauge-needle" />
+        <circle cx="28" cy="28" r="2.5" className="gauge-hub" />
+      </svg>
+      <span className="gauge-read">
+        <span className="mono">{value}</span>
+        {unit ? <span className="gauge-unit">{unit}</span> : null}
+      </span>
+      <span className="gauge-label">{label}</span>
+    </div>
+  );
+}
 
 /** The signature: a live P&ID-style schematic — reservoir → gravity line → lift station → network. */
 function SchematicHero({ q, margin }: { q: string; margin: string }) {
@@ -15,6 +33,7 @@ function SchematicHero({ q, margin }: { q: string; margin: string }) {
       <svg viewBox="0 0 560 340" role="img" className="schematic-svg">
         {/* source reservoir */}
         <rect x="24" y="28" width="118" height="92" rx="6" className="s-line" />
+        <rect x="26" y="94" width="114" height="24" className="s-fill" />
         <path d="M28 92 h112" className="s-line s-thin" />
         <path d="M28 92 q28 -8 56 0 t56 0" className="s-water" />
         {/* gravity trunk */}

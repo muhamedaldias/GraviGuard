@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { PageId } from './store';
+import { useApp, type PageId } from './store';
 
 /** Every routable page id — keep in sync with the PageId union in store.ts. */
 const ROUTE_PAGES: readonly PageId[] = [
@@ -34,31 +34,26 @@ export function formatHash(page: PageId): string {
   return page === 'landing' ? '#/' : `#/app/${page}`;
 }
 
+/** Initial page for the store: honor a deep link present at load time. */
+export function initialPageFromHash(): PageId {
+  if (typeof window === 'undefined') return 'landing';
+  return parseHash(window.location.hash) ?? 'landing';
+}
+
 /**
  * Mirrors the zustand page state to the URL hash: deep-linkable pages, working
- * back/forward, no router dependency. Store stays the single source of truth.
+ * back/forward, no router dependency. Store stays the single source of truth;
+ * the listener reads FRESH state (never a stale closure).
  */
-export function useHashRoute(
-  page: PageId,
-  setPage: (p: PageId) => void,
-): void {
-  // On mount + browser navigation: hash -> store.
+export function useHashRoute(setPage: (p: PageId) => void): void {
   useEffect(() => {
     const apply = () => {
       const parsed = parseHash(window.location.hash);
-      if (parsed !== null && parsed !== page) setPage(parsed);
+      const current = useApp.getState().page;
+      if (parsed !== null && parsed !== current) setPage(parsed);
     };
     apply();
     window.addEventListener('hashchange', apply);
     return () => window.removeEventListener('hashchange', apply);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- page is read for the no-op guard only
-  }, []);
-
-  // Store -> hash (skips identical writes to avoid history spam).
-  useEffect(() => {
-    const next = formatHash(page);
-    if (window.location.hash !== next) {
-      window.location.hash = next;
-    }
-  }, [page]);
+  }, [setPage]);
 }

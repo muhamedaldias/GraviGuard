@@ -57,7 +57,7 @@ export default function App() {
   const workerError = useApp((s) => s.workerError);
 
   useSimLifecycle();
-  useHashRoute(page, setPage);
+  useHashRoute(setPage);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
