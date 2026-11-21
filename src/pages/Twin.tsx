@@ -71,6 +71,7 @@ export function Twin() {
       <div className="panel">
         <div className="panel-title">{t('sim.margin')}</div>
         <StripChart
+          x={tArr}
           series={[
             { label: t('twin.off'), color: 'var(--critical)', data: off.hist.map((h) => h.R) },
             { label: t('twin.on'), color: 'var(--safe)', data: on.hist.map((h) => h.R) },
@@ -82,6 +83,7 @@ export function Twin() {
       <div className="panel">
         <div className="panel-title">{t('sim.damage')}</div>
         <StripChart
+          x={tArr}
           series={[
             { label: t('twin.off'), color: 'var(--critical)', data: off.hist.map((h) => h.damage) },
             { label: t('twin.on'), color: 'var(--safe)', data: on.hist.map((h) => h.damage) },

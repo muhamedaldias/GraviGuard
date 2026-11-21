@@ -15,13 +15,19 @@ export interface ChartSeries {
 }
 
 interface StripChartProps {
+  /** Independent variable (time, flow, …). Must align with every series.data. */
+  x: number[];
   series: ChartSeries[];
   height?: number;
   yLabel?: string;
   xLabel?: string;
-  /** Horizontal reference lines. */
+  /** Unit suffix for the x legend value. Default 's'. */
+  xUnit?: string;
+  /** Decimals for the x legend value. Default 1. */
+  xDecimals?: number;
+  /** Horizontal reference lines. Reactive: changes redraw without rebuilding. */
   hlines?: { y: number; color: string; label?: string }[];
-  /** Y-axis fixed range. */
+  /** Y-axis fixed range (both must be supplied to take effect). */
   yMin?: number;
   yMax?: number;
 }
@@ -35,18 +41,42 @@ function resolveColor(c: string): string {
   return c;
 }
 
-export function StripChart({ series, height = 150, yLabel, xLabel, hlines }: StripChartProps) {
+export function StripChart({
+  x,
+  series,
+  height = 150,
+  yLabel,
+  xLabel,
+  xUnit = 's',
+  xDecimals = 1,
+  hlines,
+  yMin,
+  yMax,
+}: StripChartProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const plotRef = useRef<uPlot | null>(null);
+  // Live ref so the draw hook always reads the latest hlines without a rebuild.
+  const hlinesRef = useRef(hlines);
+  hlinesRef.current = hlines;
   const lang = useApp((s) => s.lang);
   const digits = useApp((s) => s.digits);
   const locale = lang === 'ar' ? 'ar-SA' : 'en-US';
 
-  const ready = (series[0]?.data.length ?? 0) > 1;
+  const ready = x.length > 1;
+  const hasY2 = series.some((s) => s.scale === 'y2');
+  const labelsJoin = series.map((s) => s.label).join('|');
+  const scalesJoin = series.map((s) => s.scale ?? 'y').join('|');
 
   useEffect(() => {
     if (!ref.current || !ready) return;
-    const data = [series[0].data, ...series.map((s) => s.data)];
+    const data = [x, ...series.map((s) => s.data)];
+    const axes: uPlot.Axis[] = [
+      { stroke: resolveColor('var(--text-2)'), grid: { stroke: resolveColor('var(--line-soft)'), width: 1 }, font: '11px Inter, sans-serif', label: xLabel, labelFont: '11px Inter, sans-serif' },
+      { stroke: resolveColor('var(--accent)'), grid: { stroke: resolveColor('var(--line-soft)'), width: 1 }, font: '11px Inter, sans-serif', scale: 'y', label: yLabel, labelFont: '11px Inter, sans-serif' },
+    ];
+    if (hasY2) {
+      axes.push({ stroke: resolveColor('var(--water)'), grid: { show: false }, font: '11px Inter, sans-serif', scale: 'y2', side: 1, label: 'NPSH (m)', labelFont: '11px Inter, sans-serif' });
+    }
     const opts: uPlot.Options = {
       width: ref.current.clientWidth,
       height,
@@ -55,16 +85,12 @@ export function StripChart({ series, height = 150, yLabel, xLabel, hlines }: Str
       cursor: { drag: { x: true, y: false } },
       scales: {
         x: { time: false, auto: true },
-        y: { auto: true },
+        y: { auto: true, range: yMin != null && yMax != null ? [yMin, yMax] : undefined },
         y2: { auto: true },
       },
-      axes: [
-        { stroke: resolveColor('var(--text-2)'), grid: { stroke: resolveColor('var(--line-soft)'), width: 1 }, font: '11px Inter, sans-serif' },
-        { stroke: resolveColor('var(--accent)'), grid: { stroke: resolveColor('var(--line-soft)'), width: 1 }, font: '11px Inter, sans-serif', scale: 'y', label: yLabel, labelFont: '11px Inter, sans-serif' },
-        { stroke: resolveColor('var(--water)'), grid: { show: false }, font: '11px Inter, sans-serif', scale: 'y2', side: 1, label: 'NPSH (m)', labelFont: '11px Inter, sans-serif' },
-      ],
+      axes,
       series: [
-        { label: xLabel ?? 't', value: (_u, v) => formatNumber(v ?? 0, { decimals: 1, locale, digitStyle: digits }) + ' s' },
+        { label: xLabel ?? 't', value: (_u, v) => formatNumber(v ?? 0, { decimals: xDecimals, locale, digitStyle: digits }) + ' ' + xUnit },
         ...series.map((s) => ({
           label: s.label,
           stroke: resolveColor(s.color),
@@ -75,12 +101,24 @@ export function StripChart({ series, height = 150, yLabel, xLabel, hlines }: Str
         })),
       ],
       hooks: {
+        // Scales are only ranged in the first commit microtask, so parking the
+        // cursor must wait for 'ready' — valToPos right after new uPlot() is Infinity.
+        ready: [
+          (u) => {
+            const xs = u.data[0];
+            const lastX = xs[xs.length - 1];
+            if (lastX !== undefined) {
+              u.setCursor({ left: u.valToPos(lastX, 'x', true), top: u.bbox.height / 2 });
+            }
+          },
+        ],
         draw: [
           (u) => {
-            if (!hlines || hlines.length === 0) return;
+            const lines = hlinesRef.current;
+            if (!lines || lines.length === 0) return;
             const ctx = u.ctx;
             ctx.save();
-            for (const h of hlines) {
+            for (const h of lines) {
               const y = u.valToPos(h.y, 'y', true);
               ctx.strokeStyle = resolveColor(h.color);
               ctx.setLineDash([5, 4]);
@@ -102,23 +140,24 @@ export function StripChart({ series, height = 150, yLabel, xLabel, hlines }: Str
     };
     const plot = new uPlot(opts, data as unknown as uPlot.AlignedData, ref.current);
     plotRef.current = plot;
-    // Park the cursor on the latest sample so the live legend shows values.
-    const lastX = series[0].data[series[0].data.length - 1];
-    if (lastX !== undefined) {
-      plot.setCursor({ left: plot.valToPos(lastX, 'x', true), top: plot.bbox.height / 2 });
-    }
     return () => {
       plot.destroy();
       plotRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, series.map((s) => s.label).join('|'), height, yLabel, xLabel, lang, digits]);
+  }, [ready, labelsJoin, scalesJoin, series.length, hasY2, height, yLabel, xLabel, xUnit, xDecimals, yMin, yMax, lang, digits]);
 
   useEffect(() => {
     if (!plotRef.current || !ready) return;
-    const data = [series[0].data, ...series.map((s) => s.data)];
+    const data = [x, ...series.map((s) => s.data)];
     plotRef.current.setData(data as unknown as uPlot.AlignedData);
-  }, [series, ready]);
+  }, [x, series, ready]);
+
+  // hlines are read through hlinesRef in the draw hook; a redraw picks up changes
+  // without rebuilding the plot. redraw(false) reuses cached series paths.
+  useEffect(() => {
+    plotRef.current?.redraw(false);
+  }, [hlines]);
 
   useEffect(() => {
     const el = ref.current;
