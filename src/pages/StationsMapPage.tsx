@@ -6,21 +6,20 @@ import { NETWORK_VIEW, STATIONS, type Station } from '../data/stations';
 import type { Scenario } from '../sim/types';
 import '../styles/map.css';
 
-const CARTO_DARK = {
+const ESRI_DARK = {
   version: 8 as const,
   sources: {
-    carto: {
+    esri: {
       type: 'raster' as const,
       tiles: [
-        'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-        'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-        'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
       ],
       tileSize: 256,
-      attribution: '© OpenStreetMap contributors © CARTO',
+      attribution:
+        'Tiles © Esri — Esri, Maxar, Earthstar Geographics, and the GIS Community',
     },
   },
-  layers: [{ id: 'basemap', type: 'raster' as const, source: 'carto' }],
+  layers: [{ id: 'basemap', type: 'raster' as const, source: 'esri' }],
 };
 
 /**
@@ -53,7 +52,7 @@ export function StationsMapPage() {
         if (disposed || containerRef.current === null) return;
         const created: MlMap = new maplibregl.Map({
           container: containerRef.current,
-          style: CARTO_DARK,
+          style: ESRI_DARK,
           center: NETWORK_VIEW.center,
           zoom: NETWORK_VIEW.zoom,
           attributionControl: false,
