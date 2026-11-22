@@ -57,7 +57,7 @@ export function StationsMapPage() {
           center: NETWORK_VIEW.center,
           zoom: NETWORK_VIEW.zoom,
           attributionControl: false,
-          preserveDrawingBuffer: true,
+          canvasContextAttributes: { preserveDrawingBuffer: true },
         });
         map = created;
         created.on('error', (e: MlErrorEvent) => {
