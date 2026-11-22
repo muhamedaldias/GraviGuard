@@ -57,7 +57,8 @@ export function StationsMapPage() {
           if (!disposed) setMapError(e?.error?.message ?? 'tiles unavailable');
         });
         map.on('load', () => {
-          if (disposed || map === null) return;
+          const live = map;
+          if (disposed || live === null) return;
           for (const station of STATIONS) {
             const el = document.createElement('div');
             el.className = 'st-marker';
@@ -67,7 +68,7 @@ export function StationsMapPage() {
             el.appendChild(dot);
             const marker = new maplibregl.Marker({ element: el })
               .setLngLat([station.lng, station.lat])
-              .addTo(map);
+              .addTo(live);
             el.addEventListener('click', () => setSelected(station));
             markersRef.current.push(marker);
           }

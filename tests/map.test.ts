@@ -6,7 +6,7 @@ import './helpers/jsdom-stubs';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 import { act } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 
 vi.mock('../src/hooks/sim', () => ({
   useSimLifecycle: () => {},
