@@ -15,6 +15,7 @@ vi.mock('../src/hooks/sim', () => ({
 
 import { StationsMapPage } from '../src/pages/StationsMapPage';
 import { STATIONS } from '../src/data/stations';
+import '../src/i18n';
 
 describe('stations map page', () => {
   it('renders the full station list as the accessible panel', async () => {

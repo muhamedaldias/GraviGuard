@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Map as MlMap, Marker } from 'maplibre-gl';
+import type { ErrorEvent as MlErrorEvent, Map as MlMap, Marker } from 'maplibre-gl';
 import { useApp } from '../state/store';
 import { NETWORK_VIEW, STATIONS, type Station } from '../data/stations';
 import type { Scenario } from '../sim/types';
@@ -45,20 +45,21 @@ export function StationsMapPage() {
     (async () => {
       try {
         const maplibregl = (await import('maplibre-gl')).default;
+        await import('maplibre-gl/dist/maplibre-gl.css');
         if (disposed || containerRef.current === null) return;
-        map = new maplibregl.Map({
+        const created: MlMap = new maplibregl.Map({
           container: containerRef.current,
           style: CARTO_DARK,
           center: NETWORK_VIEW.center,
           zoom: NETWORK_VIEW.zoom,
           attributionControl: false,
         });
-        map.on('error', (e: { error?: Error }) => {
+        map = created;
+        created.on('error', (e: MlErrorEvent) => {
           if (!disposed) setMapError(e?.error?.message ?? 'tiles unavailable');
         });
-        map.on('load', () => {
-          const live = map;
-          if (disposed || live === null) return;
+        created.on('load', () => {
+          if (disposed) return;
           for (const station of STATIONS) {
             const el = document.createElement('div');
             el.className = 'st-marker';
@@ -68,7 +69,7 @@ export function StationsMapPage() {
             el.appendChild(dot);
             const marker = new maplibregl.Marker({ element: el })
               .setLngLat([station.lng, station.lat])
-              .addTo(live);
+              .addTo(created);
             el.addEventListener('click', () => setSelected(station));
             markersRef.current.push(marker);
           }
