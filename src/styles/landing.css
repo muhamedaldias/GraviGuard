@@ -1,0 +1,305 @@
+/* Landing — Reservoir Ink system (see DESIGN.md). One signature motif: the
+   animated flow line. Everything else stays quiet. */
+
+.landing {
+  max-width: 1160px;
+  margin-inline: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* hero — asymmetric split, RTL-aware via grid + logical props */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--space-6);
+  align-items: center;
+  padding-block-start: var(--space-6);
+}
+
+.hero-title {
+  margin: 0;
+  font-size: 44px;
+  line-height: 1.15;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  max-width: 14ch;
+}
+
+.hero-sub {
+  margin: var(--space-4) 0 0;
+  color: var(--text-1);
+  max-width: 52ch;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-block-start: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.hero-cta {
+  padding: 10px 22px;
+}
+
+.hero-cta.ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-0);
+}
+
+/* the schematic — hairline P&ID linework on the page background */
+.schematic {
+  margin: 0;
+}
+
+.schematic-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.s-line {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.5;
+}
+
+.s-thin {
+  stroke-width: 1;
+  fill: none;
+  stroke: var(--line);
+}
+
+.s-water {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  opacity: 0.8;
+}
+
+/* orchestrated load-in: paths draw once (pathLength normalized to 1) */
+.s-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-in 0.9s ease-out forwards;
+}
+
+.d1 { animation-delay: 0.05s; }
+.d2 { animation-delay: 0.25s; }
+.d3 { animation-delay: 0.45s; }
+.d4 { animation-delay: 0.65s; }
+
+@keyframes draw-in {
+  to { stroke-dashoffset: 0; }
+}
+
+/* the signature flow line — marching dashes in flow direction */
+.s-flowline {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 9;
+  stroke-linecap: round;
+  opacity: 0;
+  animation: flow-fade 0.4s ease-out 1s forwards, flow-march 1.6s linear 1s infinite;
+}
+
+@keyframes flow-fade {
+  to { opacity: 0.9; }
+}
+
+@keyframes flow-march {
+  to { stroke-dashoffset: -12; }
+}
+
+.s-needle {
+  stroke: var(--text-0);
+  stroke-width: 2;
+}
+
+.s-needle.brass {
+  stroke: var(--brass);
+}
+
+.s-fill {
+  fill: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.s-gtext,
+.s-gunit,
+.s-ltext {
+  fill: var(--text-1);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.s-gtext {
+  fill: var(--text-0);
+  font-size: 12px;
+}
+
+.s-ltext {
+  font-family: var(--font-ar);
+  font-size: 11px;
+  fill: var(--text-0);
+  opacity: 0.85;
+  text-anchor: start;
+}
+
+/* instrument rail — one ruled strip, varied-width modules, shared baseline */
+.rail {
+  display: flex;
+  border-block: 1px solid var(--line);
+}
+
+.rail-mod {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-4) var(--space-5);
+  border-inline-end: 1px solid var(--line);
+}
+
+.rail-mod:last-child {
+  border-inline-end: none;
+}
+
+.grow-1 { flex: 1; }
+.grow-2 { flex: 2; }
+
+.rail-value {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.rail-unit {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.rail-label {
+  font-size: 12px;
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rail-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* the true sequence — numbered because the content is a sequence */
+.seq-title,
+.cred-title {
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-5);
+}
+
+.seq-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.seq-item {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: var(--space-4);
+}
+
+.seq-n {
+  display: inline-block;
+  color: var(--brass);
+  font-size: 14px;
+}
+
+.seq-h {
+  margin: 6px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.seq-b {
+  margin: 0;
+  color: var(--text-1);
+  line-height: 1.6;
+  font-size: 14px;
+  max-width: 46ch;
+}
+
+/* credibility — dense, honest */
+.cred-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-6);
+}
+
+.cred-item {
+  color: var(--text-1);
+  font-size: 14px;
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid var(--line-soft);
+  line-height: 1.7;
+}
+
+/* footer */
+.foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  border-block-start: 1px solid var(--line);
+  padding-block: var(--space-4);
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+/* reduced motion: static schematic, no marching dashes */
+@media (prefers-reduced-motion: reduce) {
+  .s-draw,
+  .s-flowline {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 0.9;
+  }
+}
+
+/* narrow screens: hero stacks, rail wraps */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .seq-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cred-list {
+    grid-template-columns: 1fr;
+  }
+
+  .rail {
+    flex-direction: column;
+  }
+
+  .rail-mod {
+    border-inline-end: none;
+    border-block-end: 1px solid var(--line-soft);
+  }
+}

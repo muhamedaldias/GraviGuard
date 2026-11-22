@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import type { SimState, PlantParams, Scenario, HistorySample } from '../sim/types';
 import { CAVITY_STATES, CTRL_STATES } from '../sim/types';
 import { defaultPlant } from '../sim/defaults';
+import { initialPageFromHash } from './hashRoute';
 import type { UnitSystem, DigitStyle } from '../sim/units';
 import type { LangCode } from '../i18n';
 
@@ -37,6 +38,7 @@ function sampleFromState(s: SimState): HistorySample {
 
 export type PageId =
   | 'landing'
+  | 'map'
   | 'simulator'
   | 'curves'
   | 'twin'
@@ -91,7 +93,7 @@ export const useApp = create<AppState>((set) => ({
   units: 'SI',
   digits: 'western',
   quality: 'high',
-  page: 'landing',
+  page: initialPageFromHash(),
   snapshot: null,
   history: [],
   playing: false,

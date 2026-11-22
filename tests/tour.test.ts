@@ -75,6 +75,7 @@ function buttonIn(scope: ParentNode, label: string): HTMLButtonElement {
 }
 
 beforeEach(() => {
+  window.location.hash = '';
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string) => ({
