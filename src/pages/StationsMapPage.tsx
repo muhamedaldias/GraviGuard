@@ -45,6 +45,10 @@ export function StationsMapPage() {
     (async () => {
       try {
         const maplibregl = await import('maplibre-gl');
+        const { default: workerUrl } = await import(
+          'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
+        );
+        maplibregl.setWorkerUrl(workerUrl);
         await import('maplibre-gl/dist/maplibre-gl.css');
         if (disposed || containerRef.current === null) return;
         const created: MlMap = new maplibregl.Map({
