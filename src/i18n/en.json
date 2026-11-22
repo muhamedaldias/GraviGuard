@@ -51,7 +51,8 @@
     "reports": "Reports",
     "methodology": "Methodology",
     "tour": "Tour",
-    "settings": "Settings"
+    "settings": "Settings",
+    "map": "Stations map"
   },
   "landing": {
     "heroTitle": "Cavitation, caught before it starts",
@@ -485,5 +486,27 @@
     "vib": "vib",
     "damage": "damage",
     "ghost": "ghost"
+  },
+  "map": {
+    "title": "Network stations",
+    "subtitle": "The Amman–Zarqa corridor as a live system. Select a station, open its scenario in the simulator.",
+    "listTitle": "Station list",
+    "detailTitle": "Station details",
+    "kind": {
+      "source": "Source",
+      "lift": "Lift station",
+      "reservoir": "Reservoir",
+      "network": "Network"
+    },
+    "factKind": "Role",
+    "factScenario": "Scenario",
+    "factFlow": "Nominal flow",
+    "factHead": "Pump head",
+    "factLevel": "Water level",
+    "unitFlow": "m³/s",
+    "unitHead": "m",
+    "openInSimulator": "Open in simulator",
+    "opening": "Loading scenario…",
+    "errorNote": "Map note"
   }
 }

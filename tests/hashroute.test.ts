@@ -28,7 +28,7 @@ describe('hash route parsing', () => {
 
   it('round-trips every page id', () => {
     const pages = [
-      'landing', 'simulator', 'curves', 'twin', 'pump', 'controller', 'sensors',
+      'landing', 'map', 'simulator', 'curves', 'twin', 'pump', 'controller', 'sensors',
       'transients', 'sizing', 'applicability', 'montecarlo', 'scenarios',
       'reports', 'methodology', 'tour', 'settings',
     ] as const;

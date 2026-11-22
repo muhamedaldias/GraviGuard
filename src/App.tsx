@@ -6,6 +6,7 @@ import { LANGS } from './i18n';
 import { SyntheticBadge } from './components/Badges';
 import { useHashRoute } from './state/hashRoute';
 import { Landing } from './pages/Landing';
+import { StationsMapPage } from './pages/StationsMapPage';
 import { Simulator } from './pages/Simulator';
 import { Curves } from './pages/Curves';
 import { Twin } from './pages/Twin';
@@ -24,6 +25,7 @@ import { SettingsPage } from './pages/SettingsPage';
 
 const PAGES: { id: PageId; labelKey: string; component: React.ComponentType | null }[] = [
   { id: 'landing', labelKey: 'nav.landing', component: Landing },
+  { id: 'map', labelKey: 'nav.map', component: StationsMapPage },
   { id: 'simulator', labelKey: 'nav.simulator', component: Simulator },
   { id: 'curves', labelKey: 'nav.curves', component: Curves },
   { id: 'twin', labelKey: 'nav.twin', component: Twin },

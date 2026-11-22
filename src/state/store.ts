@@ -38,6 +38,7 @@ function sampleFromState(s: SimState): HistorySample {
 
 export type PageId =
   | 'landing'
+  | 'map'
   | 'simulator'
   | 'curves'
   | 'twin'

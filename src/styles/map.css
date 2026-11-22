@@ -1,0 +1,192 @@
+/* Stations map — Reservoir Ink system. The map is the stage; the panel is the
+   instrument list (inline, not a floating card). */
+
+.map-page {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: var(--space-4);
+  width: 100%;
+  align-items: stretch;
+}
+
+.map-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  max-height: 640px;
+}
+
+.map-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.map-sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.st-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.st-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  text-align: start;
+  cursor: pointer;
+  font: inherit;
+  color: var(--text-0);
+}
+
+.st-row:hover {
+  background: var(--bg-2);
+}
+
+.st-row.sel {
+  border-color: var(--flow);
+  background: var(--bg-2);
+}
+
+.st-row-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--flow);
+}
+
+.st-row-dot[data-kind='source'] { background: var(--brass); }
+.st-row-dot[data-kind='lift'] { background: var(--water); }
+.st-row-dot[data-kind='network'] { background: var(--ok); }
+
+.st-row-name {
+  font-size: 14px;
+}
+
+.st-row-kind {
+  font-size: 11px;
+}
+
+.st-detail {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.st-detail-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.st-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-4);
+}
+
+.st-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.st-facts dt {
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.st-facts dd {
+  margin: 0;
+  font-size: 14px;
+}
+
+.st-open {
+  align-self: flex-start;
+  padding: 8px 18px;
+}
+
+.map-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--brass);
+}
+
+.map-stage {
+  position: relative;
+  min-height: 560px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.map-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* markers — brass ring, accent dot, subtle pulse; hidden from AT (panel is the
+   accessible path) */
+.st-marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--brass);
+  background: var(--bg-0);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.st-marker .st-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--flow);
+  animation: st-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes st-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-marker .st-dot {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .map-page {
+    grid-template-columns: 1fr;
+  }
+
+  .map-stage {
+    min-height: 380px;
+    order: -1;
+  }
+}

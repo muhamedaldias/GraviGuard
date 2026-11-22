@@ -4,6 +4,7 @@ import { useApp, type PageId } from './store';
 /** Every routable page id — keep in sync with the PageId union in store.ts. */
 const ROUTE_PAGES: readonly PageId[] = [
   'landing',
+  'map',
   'simulator',
   'curves',
   'twin',
